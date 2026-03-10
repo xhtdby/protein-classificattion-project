@@ -1,0 +1,31 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Large cached features (regenerate with scripts)
+outputs/features/*.npy
+
+# Temporary logs
+*.log
+advanced_esm_log.txt
+interp_log.txt
+outputs/interp_log*.txt
+outputs/interp_subprocess.txt
+outputs/test_stdout.txt
+
+# Coursework HTML
+*.html
+
+# IDE / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Model artifacts (large binary files)
+outputs/models/*.joblib
+outputs/models/*.pt
