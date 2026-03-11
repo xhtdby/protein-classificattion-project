@@ -1,0 +1,43 @@
+{
+  "models": [
+    {
+      "model_name": "Logistic Regression",
+      "summary": {
+        "accuracy_mean": 0.4572979622991311,
+        "accuracy_std": 0.003294752978882558,
+        "macro_f1_mean": 0.191169533426941,
+        "macro_f1_std": 0.0018097738472041592,
+        "balanced_accuracy_mean": 0.299744935390983,
+        "balanced_accuracy_std": 0.00970183274861053,
+        "mcc_mean": 0.17104648646880777,
+        "mcc_std": 0.003463673177449524
+      }
+    },
+    {
+      "model_name": "Random Forest",
+      "summary": {
+        "accuracy_mean": 0.8156121217434116,
+        "accuracy_std": 0.0006459985343645365,
+        "macro_f1_mean": 0.1412876962534816,
+        "macro_f1_std": 0.001965285636004028,
+        "balanced_accuracy_mean": 0.14920370981305903,
+        "balanced_accuracy_std": 0.0010256600524070642,
+        "mcc_mean": 0.09302252531627646,
+        "mcc_std": 0.010776399961815382
+      }
+    },
+    {
+      "model_name": "Random Forest + PCA(50)",
+      "summary": {
+        "accuracy_mean": 0.815763014526237,
+        "accuracy_std": 0.00207318982670797,
+        "macro_f1_mean": 0.1973083048804467,
+        "macro_f1_std": 0.0021614167650250943,
+        "balanced_accuracy_mean": 0.18497948780259002,
+        "balanced_accuracy_std": 0.0008874148823343373,
+        "mcc_mean": 0.21646800549123454,
+        "mcc_std": 0.005887210660680819
+      }
+    }
+  ]
+}

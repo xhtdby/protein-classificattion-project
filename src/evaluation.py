@@ -1,7 +1,9 @@
 """
-Evaluation utilities: metrics computation, confusion matrix plotting, comparison tables.
+Evaluation utilities: metrics computation, confusion matrix plotting, comparison tables,
+and structured JSON result persistence.
 """
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +21,35 @@ from sklearn.metrics import (
 )
 
 from src.data_loading import CLASS_NAMES
+
+
+def _to_serializable(obj):
+    """Convert numpy types to Python natives for JSON serialization."""
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, (np.floating,)):
+        return float(obj)
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, dict):
+        return {k: _to_serializable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_serializable(v) for v in obj]
+    return obj
+
+
+def save_results_json(data: dict, path: Path) -> None:
+    """Save a results dict to JSON, converting numpy types automatically."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(_to_serializable(data), f, indent=2)
+    print(f"Results saved to {path}")
+
+
+def load_results_json(path: Path) -> dict:
+    """Load a results JSON file."""
+    with open(path) as f:
+        return json.load(f)
 
 
 def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]:
@@ -144,7 +175,7 @@ def plot_class_distribution(labels: np.ndarray, save_path: Path | None = None) -
     colors = sns.color_palette("Set2", len(CLASS_NAMES))
     bars = ax.bar(CLASS_NAMES, counts, color=colors)
     for bar, count in zip(bars, counts):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 200,
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() * 1.15,
                 f"{count:,}", ha="center", va="bottom", fontsize=9)
     ax.set_xlabel("Class")
     ax.set_ylabel("Count")

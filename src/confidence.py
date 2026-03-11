@@ -29,15 +29,9 @@ def assign_confidence(proba: np.ndarray) -> list[str]:
     else:
         max_p = proba
 
-    levels = []
-    for p in max_p:
-        if p >= 0.80:
-            levels.append("High")
-        elif p >= 0.50:
-            levels.append("Medium")
-        else:
-            levels.append("Low")
-    return levels
+    levels = np.where(max_p >= 0.80, "High",
+                      np.where(max_p >= 0.50, "Medium", "Low"))
+    return levels.tolist()
 
 
 def confidence_calibration_report(
@@ -117,16 +111,14 @@ def _plot_reliability_diagram(max_p: np.ndarray, correct: np.ndarray, save_path:
     # Calibration curve
     ax1.plot([0, 1], [0, 1], "k--", label="Perfect calibration")
     ax1.bar(bin_confs, bin_accs, width=0.08, alpha=0.7, color="steelblue", label="Model")
+    ax1.axvline(x=0.50, color="orange", linestyle=":", alpha=0.7, label="Medium threshold")
+    ax1.axvline(x=0.80, color="red", linestyle=":", alpha=0.7, label="High threshold")
     ax1.set_xlabel("Mean Predicted Probability")
     ax1.set_ylabel("Fraction Correct")
     ax1.set_title("Reliability Diagram")
     ax1.legend()
     ax1.set_xlim(0, 1)
     ax1.set_ylim(0, 1)
-
-    # Add confidence threshold lines
-    ax1.axvline(x=0.50, color="orange", linestyle=":", alpha=0.7, label="Medium threshold")
-    ax1.axvline(x=0.80, color="red", linestyle=":", alpha=0.7, label="High threshold")
 
     # Histogram of predictions
     ax2.bar(bin_confs, bin_counts, width=0.08, color="steelblue", alpha=0.7)
@@ -178,12 +170,31 @@ if __name__ == "__main__":
     df = load_all_sequences(project_root)
     y = df["label"].values
 
-    feat_file = "esm2_embeddings.npy" if "ESM" in feature_source else "handcrafted_features.npy"
-    X = np.load(features_dir / feat_file)
+    esm_model_name = artifact.get("esm_model_name", "esm2_t6_8M_UR50D")
+
+    # Build feature matrix matching feature_source
+    if "Physicochemical" in feature_source and "ESM" in feature_source:
+        from src.features.embeddings import get_cache_filename
+        esm_file = get_cache_filename(esm_model_name)
+        esm_X = np.load(features_dir / esm_file)
+        hc_path = features_dir / "handcrafted_features.npy"
+        if hc_path.exists():
+            hc_X = np.load(hc_path)
+            physico_X = hc_X[:, -8:]
+        else:
+            from src.features.physicochemical import extract_physicochemical_features
+            seqs = df["sequence"].tolist()
+            physico_X = extract_physicochemical_features(seqs)
+        X = np.hstack([esm_X, physico_X])
+    elif "ESM" in feature_source:
+        from src.features.embeddings import get_cache_filename
+        esm_file = get_cache_filename(esm_model_name)
+        X = np.load(features_dir / esm_file)
+    else:
+        X = np.load(features_dir / "handcrafted_features.npy")
     print(f"Features loaded: {X.shape}")
 
     # Stratified 20% hold-out -- indices for fresh scaler fitting
-    from sklearn.model_selection import StratifiedShuffleSplit
     from sklearn.preprocessing import StandardScaler
     sss = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=SEED)
     train_idx, val_idx = next(sss.split(X, y))
@@ -215,3 +226,12 @@ if __name__ == "__main__":
         y_val, y_proba, y_pred,
         save_path=figures_dir / "reliability_diagram.png",
     )
+
+    # -- Persist structured results to JSON ------------------------------------
+    from src.evaluation import save_results_json
+    conf_data = {
+        "feature_source": feature_source,
+        "n_samples": len(y_val),
+        "calibration": report,
+    }
+    save_results_json(conf_data, project_root / "outputs" / "confidence_results.json")

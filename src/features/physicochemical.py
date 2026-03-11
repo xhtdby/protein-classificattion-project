@@ -7,7 +7,7 @@ Features per sequence:
 - Aromaticity (fraction of F + W + Y)
 - GRAVY (Grand Average of Hydropathicity, Kyte-Doolittle)
 - Net charge at pH 7.0
-- Secondary structure propensity fractions (helix, sheet, coil)
+- Secondary structure propensity fractions (helix, turn, sheet)
 """
 
 import numpy as np

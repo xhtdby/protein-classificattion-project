@@ -14,15 +14,18 @@ from pathlib import Path
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
 
 from src.data_loading import load_all_sequences, get_cv_splits, SEED
 from src.features.composition import extract_composition_features
 from src.features.physicochemical import extract_physicochemical_features
-from src.training import cross_validate_model, print_cv_summary, _fmt_time
+from src.training import cross_validate_model, print_cv_summary, fmt_time
 from src.evaluation import (
     plot_confusion_matrix,
     print_metrics_table,
     print_classification_report,
+    save_results_json,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,10 +45,27 @@ def make_random_forest():
     """Create a fresh Random Forest model."""
     return RandomForestClassifier(
         n_estimators=300,
+        max_depth=20,
+        min_samples_leaf=5,
         class_weight="balanced",
         random_state=SEED,
         n_jobs=-1,
     )
+
+
+def make_random_forest_pca(n_components: int = 50):
+    """RF with PCA pre-reduction — avoids curse of dimensionality on sparse dipeptides."""
+    return Pipeline([
+        ("pca", PCA(n_components=n_components, random_state=SEED)),
+        ("rf", RandomForestClassifier(
+            n_estimators=300,
+            max_depth=20,
+            min_samples_leaf=5,
+            class_weight="balanced",
+            random_state=SEED,
+            n_jobs=-1,
+        )),
+    ])
 
 
 def build_handcrafted_features(sequences: list[str], cache_dir: Path | None = None) -> np.ndarray:
@@ -110,14 +130,14 @@ if __name__ == "__main__":
     df = load_all_sequences(project_root)
     sequences = df["sequence"].tolist()
     y = df["label"].values
-    print(f"  Loaded {len(df):,} sequences  [{_fmt_time(time.time() - t0)}]")
+    print(f"  Loaded {len(df):,} sequences  [{fmt_time(time.time() - t0)}]")
     print(f"  Class counts: {np.bincount(y).tolist()}")
 
     # -- Features --------------------------------------------------------------
     t_feat = time.time()
     print("\nExtracting handcrafted features (cached if already done)...")
     X = build_handcrafted_features(sequences, cache_dir=features_dir)
-    print(f"  Feature matrix: {X.shape}  [{_fmt_time(time.time() - t_feat)}]")
+    print(f"  Feature matrix: {X.shape}  [{fmt_time(time.time() - t_feat)}]")
 
     cv_splits = get_cv_splits(y)
 
@@ -155,10 +175,42 @@ if __name__ == "__main__":
         traceback.print_exc()
         sys.exit(1)
 
+    # -- Random Forest + PCA (fix sparse dipeptide curse) ----------------------
+    try:
+        rf_pca_results = cross_validate_model(
+            make_random_forest_pca, X, y,
+            cv_splits=cv_splits, use_scaler=False,  # PCA handles scaling internally
+            model_name="Random Forest + PCA(50)",
+        )
+        print_cv_summary(rf_pca_results)
+        plot_confusion_matrix(
+            rf_pca_results["oof_true"], rf_pca_results["oof_preds"],
+            save_path=figures_dir / "cm_random_forest_pca.png",
+            title="Random Forest + PCA(50) -- Confusion Matrix",
+        )
+    except Exception:
+        print("\nWARN: RF+PCA training failed:")
+        traceback.print_exc()
+        rf_pca_results = None
+
     # -- Summary ---------------------------------------------------------------
-    print_metrics_table([lr_results, rf_results])
+    baselines = [lr_results, rf_results]
+    if rf_pca_results is not None:
+        baselines.append(rf_pca_results)
+    print_metrics_table(baselines)
     print("\n--- Logistic Regression Classification Report ---")
     print_classification_report(lr_results["oof_true"], lr_results["oof_preds"])
     print("\n--- Random Forest Classification Report ---")
     print_classification_report(rf_results["oof_true"], rf_results["oof_preds"])
-    print(f"\nTotal wall time: {_fmt_time(time.time() - t0)}")
+
+    # -- Persist structured results to JSON ------------------------------------
+    results_dir = project_root / "outputs"
+    baseline_data = {
+        "models": [
+            {"model_name": r["model_name"], "summary": r["summary"]}
+            for r in baselines
+        ],
+    }
+    save_results_json(baseline_data, results_dir / "baseline_results.json")
+
+    print(f"\nTotal wall time: {fmt_time(time.time() - t0)}")

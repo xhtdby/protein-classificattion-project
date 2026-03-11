@@ -7,7 +7,6 @@ CRITICAL RULES (enforced here):
 - Metrics computed on unmodified validation fold
 """
 
-import random
 import logging
 import time
 import traceback
@@ -18,16 +17,12 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, f1_score, balanced_accuracy_score, matthews_corrcoef
 
-from src.data_loading import get_cv_splits
+from src.data_loading import get_cv_splits, SEED
 
 logger = logging.getLogger(__name__)
 
-SEED = 42
-random.seed(SEED)
-np.random.seed(SEED)
 
-
-def _fmt_time(seconds: float) -> str:
+def fmt_time(seconds: float) -> str:
     """Format seconds as mm:ss or Xh Xm."""
     if seconds < 60:
         return f"{seconds:.0f}s"
@@ -47,9 +42,16 @@ def cross_validate_model(
     n_splits: int = 5,
     use_scaler: bool = True,
     use_smote: bool = False,
+    use_class_weight: bool = False,
     model_name: str = "model",
 ) -> dict:
-    """Run stratified K-fold cross-validation with leak-safe preprocessing."""
+    """Run stratified K-fold cross-validation with leak-safe preprocessing.
+
+    Args:
+        use_class_weight: If True (and use_smote is False), compute balanced
+            sample weights and pass to model.fit(). Use for models like XGBoost
+            that don't have a built-in class_weight parameter.
+    """
     if cv_splits is None:
         cv_splits = get_cv_splits(y, n_splits=n_splits)
 
@@ -89,13 +91,19 @@ def cross_validate_model(
             print(f"SMOTE... ", end="", flush=True)
             smote = SMOTE(random_state=SEED)
             X_train, y_train = smote.fit_resample(X_train, y_train)
-            print(f"({_fmt_time(time.time()-smote_start)}, "
+            print(f"({fmt_time(time.time()-smote_start)}, "
                   f"resampled to {len(y_train):,})  ", end="", flush=True)
+
+        # Compute balanced sample weights for class imbalance (skip when SMOTE active)
+        fit_kwargs = {}
+        if use_class_weight and not use_smote:
+            from sklearn.utils.class_weight import compute_sample_weight
+            fit_kwargs["sample_weight"] = compute_sample_weight("balanced", y_train)
 
         # Train
         try:
             model = model_fn()
-            model.fit(X_train, y_train)
+            model.fit(X_train, y_train, **fit_kwargs)
         except Exception:
             print("\n  ERROR during model.fit():")
             traceback.print_exc()
@@ -133,7 +141,7 @@ def cross_validate_model(
         print(
             f"Acc={metrics['accuracy']:.4f}  F1={metrics['macro_f1']:.4f}  "
             f"BA={metrics['balanced_accuracy']:.4f}  MCC={metrics['mcc']:.4f}  "
-            f"[{_fmt_time(fold_elapsed)} | ETA {_fmt_time(eta)}]"
+            f"[{fmt_time(fold_elapsed)} | ETA {fmt_time(eta)}]"
         )
         logger.debug(
             "Fold %d | Acc=%.4f  F1=%.4f  BA=%.4f  MCC=%.4f  time=%.1fs",
@@ -142,7 +150,7 @@ def cross_validate_model(
         )
 
     total_elapsed = time.time() - cv_start
-    print(f"  Total CV time: {_fmt_time(total_elapsed)}")
+    print(f"  Total CV time: {fmt_time(total_elapsed)}")
 
     # Aggregate
     metric_names = ["accuracy", "macro_f1", "balanced_accuracy", "mcc"]
@@ -187,3 +195,47 @@ def print_cv_summary(results: dict) -> None:
     print(f"  Balanced Accuracy: {s['balanced_accuracy_mean']:.4f} +/- {s['balanced_accuracy_std']:.4f}")
     print(f"  MCC:               {s['mcc_mean']:.4f} +/- {s['mcc_std']:.4f}")
     print(f"{'='*60}")
+
+
+def optimize_thresholds(
+    y_true: np.ndarray,
+    y_proba: np.ndarray,
+    n_classes: int = 7,
+    metric: str = "macro_f1",
+) -> tuple[np.ndarray, dict]:
+    """Find per-class decision thresholds that maximize Macro F1.
+
+    Instead of argmax, we adjust thresholds per class so rare classes
+    get a lower bar for being predicted.
+
+    Returns (thresholds array, metrics dict with the optimized predictions).
+    """
+    from scipy.optimize import minimize
+
+    def _predict_with_thresholds(proba: np.ndarray, thresholds: np.ndarray) -> np.ndarray:
+        adjusted = proba / thresholds[np.newaxis, :]
+        return adjusted.argmax(axis=1)
+
+    def _neg_macro_f1(flat_thresholds: np.ndarray) -> float:
+        thresholds = np.exp(flat_thresholds)  # keep positive
+        y_pred = _predict_with_thresholds(y_proba, thresholds)
+        return -f1_score(y_true, y_pred, average="macro", zero_division=0)
+
+    # Start from uniform thresholds (log-space)
+    x0 = np.zeros(n_classes)
+    result = minimize(
+        _neg_macro_f1, x0, method="Nelder-Mead",
+        options={"maxiter": 2000, "xatol": 1e-4, "fatol": 1e-5},
+    )
+    best_thresholds = np.exp(result.x)
+    # Normalize so class 0 threshold = 1.0
+    best_thresholds /= best_thresholds[0]
+
+    y_pred_opt = _predict_with_thresholds(y_proba, best_thresholds)
+    metrics_opt = {
+        "accuracy": accuracy_score(y_true, y_pred_opt),
+        "macro_f1": f1_score(y_true, y_pred_opt, average="macro", zero_division=0),
+        "balanced_accuracy": balanced_accuracy_score(y_true, y_pred_opt),
+        "mcc": matthews_corrcoef(y_true, y_pred_opt),
+    }
+    return best_thresholds, metrics_opt

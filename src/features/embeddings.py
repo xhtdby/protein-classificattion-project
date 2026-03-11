@@ -163,7 +163,50 @@ def load_or_compute_embeddings(
     return embeddings
 
 
+# -- Recommended batch sizes per model & device --------------------------------
+BATCH_SIZE_DEFAULTS = {
+    "esm2_t6_8M_UR50D":    {"cuda": 32, "mps": 16, "cpu": 8},
+    "esm2_t33_650M_UR50D": {"cuda": 2,  "mps": 1,  "cpu": 1},
+}
+
+
+def get_cache_filename(model_name: str) -> str:
+    """Return cache .npy filename for a given ESM-2 model."""
+    if model_name == "esm2_t6_8M_UR50D":
+        return "esm2_embeddings.npy"          # backwards-compatible
+    return f"esm2_embeddings_{model_name}.npy"
+
+
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Extract ESM-2 protein embeddings",
+        epilog="Examples:\n"
+               "  python -m src.features.embeddings                    # 8M model (fast, 320-d)\n"
+               "  python -m src.features.embeddings --model 650M       # 650M model (slow, 1280-d)\n"
+               "  python -m src.features.embeddings --model 650M --batch-size 1   # low-VRAM GPU\n",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--model", default="8M",
+        choices=["8M", "650M", "esm2_t6_8M_UR50D", "esm2_t33_650M_UR50D"],
+        help="ESM-2 model size: '8M' (320-d, fast) or '650M' (1280-d, accurate). Default: 8M",
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=0,
+        help="Override batch size (0 = auto based on model & device)",
+    )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Re-extract even if cache file already exists",
+    )
+    args = parser.parse_args()
+
+    # Resolve model shorthand
+    MODEL_ALIAS = {"8M": "esm2_t6_8M_UR50D", "650M": "esm2_t33_650M_UR50D"}
+    model_name = MODEL_ALIAS.get(args.model, args.model)
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s  %(levelname)-8s  %(message)s",
@@ -174,39 +217,48 @@ if __name__ == "__main__":
     logging.getLogger("PIL").setLevel(logging.WARNING)
 
     from src.data_loading import load_all_sequences
-    from src.training import _fmt_time
+    from src.training import fmt_time
 
     device = _get_device()
     print("=" * 72)
-    print("  ESM-2 EMBEDDING EXTRACTION")
+    print(f"  ESM-2 EMBEDDING EXTRACTION  ({model_name})")
     print("=" * 72)
     _print_device_info(device)
 
     project_root = Path(__file__).resolve().parent.parent.parent
     features_dir = project_root / "outputs" / "features"
-    cache_path = features_dir / "esm2_embeddings.npy"
+    cache_path = features_dir / get_cache_filename(model_name)
+
+    if args.force and cache_path.exists():
+        cache_path.unlink()
+        print(f"  Removed existing cache: {cache_path.name}")
 
     t0 = time.time()
     print("\nLoading sequences...")
     df = load_all_sequences(project_root)
     sequences = df["sequence"].tolist()
     seq_ids = df["seq_id"].tolist()
-    print(f"  Loaded {len(sequences):,} sequences  [{_fmt_time(time.time() - t0)}]")
+    print(f"  Loaded {len(sequences):,} sequences  [{fmt_time(time.time() - t0)}]")
 
-    # Auto batch size: smaller on CPU to avoid memory issues; conservative on GPU
-    batch_size = 16 if device.type == "cuda" else 8
+    # Auto batch size based on model & device
+    if args.batch_size > 0:
+        batch_size = args.batch_size
+    else:
+        device_type = device.type  # "cuda", "mps", or "cpu"
+        batch_size = BATCH_SIZE_DEFAULTS.get(model_name, {}).get(device_type, 4)
+    print(f"  Batch size: {batch_size}")
 
     try:
         embeddings = load_or_compute_embeddings(
             sequences=sequences,
             seq_ids=seq_ids,
             cache_path=cache_path,
-            model_name="esm2_t6_8M_UR50D",
+            model_name=model_name,
             batch_size=batch_size,
         )
         print(f"\nEmbedding matrix: {embeddings.shape}")
         print(f"Sample norms (first 5): {np.linalg.norm(embeddings[:5], axis=1).round(3)}")
-        print(f"\nTotal wall time: {_fmt_time(time.time() - t0)}")
+        print(f"\nTotal wall time: {fmt_time(time.time() - t0)}")
     except ImportError:
         print("\nERROR: fair-esm not installed. Run:  pip install fair-esm", file=sys.stderr)
         sys.exit(1)

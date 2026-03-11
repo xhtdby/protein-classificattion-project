@@ -92,35 +92,36 @@ All experiments use **stratified 5-fold cross-validation**. Best model selected 
 |-------|----------|----------|----------|---------------|-----|
 | Logistic Regression | Handcrafted (429-d) | 0.457 | 0.191 | 0.300 | 0.171 |
 | Random Forest | Handcrafted (429-d) | 0.815 | 0.128 | 0.143 | -0.003 |
-| XGBoost | ESM-2 (320-d) | 0.867 | 0.466 | 0.394 | 0.522 |
-| LightGBM | ESM-2 (320-d) | 0.867 | 0.516 | 0.481 | 0.576 |
+| **XGBoost** | **ESM-2 (320-d)** | **0.865** | **0.531** | **0.508** | **0.581** |
+| LightGBM | ESM-2 (320-d) | 0.867 | 0.515 | 0.480 | 0.575 |
 | XGBoost + SMOTE | ESM-2 (320-d) | 0.849 | 0.527 | 0.541 | 0.569 |
-| **LightGBM + SMOTE** | **ESM-2 (320-d)** | **0.854** | **0.528** | **0.526** | **0.569** |
+| LightGBM + SMOTE | ESM-2 (320-d) | 0.853 | 0.526 | 0.523 | 0.565 |
 
-### Feature Ablation Study (XGBoost baseline)
+### Feature Ablation Study (XGBoost with balanced sample weights)
 
 | Feature Set | Accuracy | Macro F1 | Balanced Acc. | MCC |
 |-------------|----------|----------|---------------|-----|
-| ESM-2 only (320-d) | 0.867 | 0.466 | 0.394 | 0.522 |
-| Handcrafted only (429-d) | 0.818 | 0.168 | 0.164 | 0.163 |
-| ESM-2 + Handcrafted (749-d) | 0.863 | 0.431 | 0.361 | 0.498 |
-| ESM-2 + Physicochemical (328-d) | 0.868 | 0.472 | 0.399 | 0.528 |
+| ESM-2 only (320-d) | 0.865 | 0.531 | 0.508 | 0.581 |
+| Handcrafted only (429-d) | 0.781 | 0.247 | 0.246 | 0.304 |
+| ESM-2 + Handcrafted (749-d) | 0.865 | 0.502 | 0.473 | 0.570 |
+| **ESM-2 + Physicochemical (328-d)** | **0.866** | **0.535** | **0.515** | **0.588** |
 
 ### Key Findings
 
-- **ESM-2 embeddings dominate** handcrafted features (Macro F1: 0.47 vs 0.17)
-- **SMOTE** significantly improves balanced accuracy (+0.13) at minimal accuracy cost
-- Adding handcrafted features to ESM-2 **hurts** performance (noise dilution)
-- **Best model**: LightGBM + SMOTE with `class_weight='balanced'` on ESM-2 features
-- Per-class weaknesses: Lyase (F1=0.27), Isomerase (F1=0.30) — smallest classes
+- **ESM-2 embeddings dominate** handcrafted features (Macro F1: 0.53 vs 0.25)
+- **Balanced sample weights** significantly improve XGBoost minority-class recall (+14% Macro F1 vs unweighted)
+- **ESM-2 + Physicochemical** is the strongest feature combination (F1=0.535, MCC=0.588)
+- Adding all handcrafted features to ESM-2 **hurts** performance (noise dilution from 429 extra dimensions)
+- **Best model**: XGBoost with balanced sample weights on ESM-2 features
+- Per-class weaknesses: Lyase (F1=0.24), Isomerase (F1=0.30) — smallest classes
 
 ### Confidence Calibration
 
 | Level | Count | Accuracy | Mean Max Prob |
 |-------|-------|----------|---------------|
-| High (p ≥ 0.80) | 30,842 (77.6%) | 94.0% | 0.966 |
-| Medium (0.50 ≤ p < 0.80) | 6,504 (16.4%) | 61.6% | 0.658 |
-| Low (p < 0.50) | 2,418 (6.1%) | 39.3% | 0.415 |
+| High (p ≥ 0.80) | 30,404 (76.5%) | 95.0% | 0.958 |
+| Medium (0.50 ≤ p < 0.80) | 6,697 (16.8%) | 65.9% | 0.662 |
+| Low (p < 0.50) | 2,663 (6.7%) | 40.5% | 0.409 |
 
 ## Class Distribution
 

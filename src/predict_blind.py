@@ -47,22 +47,33 @@ def extract_features(
 
     Args:
         sequences: List of amino acid strings.
-        feature_source: One of "Handcrafted", "ESM-2", "Handcrafted + ESM-2".
+        feature_source: One of "Handcrafted", "ESM-2", "Handcrafted + ESM-2",
+                        "ESM-2 + Physicochemical".
 
     Returns:
         Feature matrix (N, D).
     """
     parts = []
+    source_lower = feature_source.lower()
 
-    if "Handcrafted" in feature_source or "handcrafted" in feature_source.lower():
+    needs_handcrafted = "handcrafted" in source_lower
+    needs_esm = "esm" in source_lower
+    needs_physico = "physicochemical" in source_lower
+
+    if needs_handcrafted:
         comp = extract_composition_features(sequences)
         phys = extract_physicochemical_features(sequences)
         parts.append(np.hstack([comp, phys]))
 
-    if "ESM" in feature_source or "esm" in feature_source.lower():
+    if needs_esm:
         from src.features.embeddings import extract_esm2_embeddings
         emb = extract_esm2_embeddings(sequences, model_name=model_name)
         parts.append(emb)
+
+    if needs_physico and not needs_handcrafted:
+        # Physicochemical only (without full handcrafted composition)
+        phys = extract_physicochemical_features(sequences)
+        parts.append(phys)
 
     if not parts:
         raise ValueError(f"Unknown feature source: {feature_source}")
@@ -87,8 +98,11 @@ def predict_blind(
     model = artefact["model"]
     scaler = artefact["scaler"]
     feature_source = artefact.get("feature_source", "Handcrafted")
+    esm_model_name = artefact.get("esm_model_name", "esm2_t6_8M_UR50D")
+    thresholds = artefact.get("thresholds")  # per-class decision thresholds
 
-    logger.info("Loaded model from %s (feature source: %s)", model_path, feature_source)
+    logger.info("Loaded model from %s (feature source: %s, ESM: %s)",
+                model_path, feature_source, esm_model_name)
 
     # Parse FASTA
     seq_ids, sequences = load_fasta_sequences(fasta_path)
@@ -98,18 +112,29 @@ def predict_blind(
         raise ValueError(f"No sequences found in {fasta_path}")
 
     # Extract features
-    X = extract_features(sequences, feature_source)
+    X = extract_features(sequences, feature_source, model_name=esm_model_name)
+    if X.shape[1] != scaler.n_features_in_:
+        raise ValueError(
+            f"Feature dimension mismatch: extracted {X.shape[1]}, "
+            f"model expects {scaler.n_features_in_}"
+        )
     X = scaler.transform(X)
 
     # Predict -- suppress sklearn's feature-names warning for LightGBM
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message=".*feature names.*", category=UserWarning)
-        y_pred = model.predict(X)
         y_proba = (
             model.predict_proba(X)
             if hasattr(model, "predict_proba")
             else np.zeros((len(X), 7))
         )
+        # Apply per-class thresholds if available
+        if thresholds is not None:
+            adjusted = y_proba / thresholds[np.newaxis, :]
+            y_pred = adjusted.argmax(axis=1)
+            logger.info("Applied per-class thresholds: %s", np.round(thresholds, 3))
+        else:
+            y_pred = y_proba.argmax(axis=1)
 
     # Confidence
     confidence_levels = assign_confidence(y_proba)

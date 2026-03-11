@@ -1,0 +1,21 @@
+{
+  "feature_source": "ESM-2 + Physicochemical",
+  "n_samples": 39764,
+  "calibration": {
+    "High": {
+      "count": 30448,
+      "accuracy": 0.9507685233841303,
+      "mean_prob": 0.9593817591667175
+    },
+    "Medium": {
+      "count": 6658,
+      "accuracy": 0.6620606788825473,
+      "mean_prob": 0.6633129119873047
+    },
+    "Low": {
+      "count": 2658,
+      "accuracy": 0.41196388261851014,
+      "mean_prob": 0.4106118381023407
+    }
+  }
+}

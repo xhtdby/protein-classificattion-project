@@ -248,6 +248,114 @@ def shap_analysis(
     if class_names is None:
         class_names = CLASS_NAMES
 
+
+def high_confidence_error_analysis(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    y_proba: np.ndarray,
+    class_names: list[str] | None = None,
+    save_dir: Path | None = None,
+) -> None:
+    """Break down high-confidence errors by true class and predicted class.
+
+    Answers: which classes produce the most over-confident wrong predictions?
+    """
+    if class_names is None:
+        class_names = CLASS_NAMES
+
+    max_p = y_proba.max(axis=1)
+    wrong = y_true != y_pred
+    high_conf = max_p >= 0.80
+    hc_wrong = wrong & high_conf
+
+    n_hc_wrong = hc_wrong.sum()
+    n_wrong = wrong.sum()
+    print(f"\n=== High-Confidence Error Analysis ===")
+    print(f"  Total errors: {n_wrong}")
+    print(f"  High-confidence errors (p>=0.80): {n_hc_wrong} "
+          f"({100*n_hc_wrong/max(n_wrong,1):.1f}% of errors)")
+
+    if n_hc_wrong == 0:
+        print("  No high-confidence errors to analyse.")
+        return
+
+    # Breakdown by true class
+    print(f"\n  By TRUE class (what was the sample actually?):")
+    for c in range(len(class_names)):
+        mask = hc_wrong & (y_true == c)
+        n = mask.sum()
+        if n > 0:
+            total_c = (y_true == c).sum()
+            print(f"    {class_names[c]:<20s}: {n:>4d} high-conf errors  "
+                  f"({100*n/total_c:.1f}% of class samples)")
+
+    # Breakdown by predicted class
+    print(f"\n  By PREDICTED class (what did the model wrongly say?):")
+    for c in range(len(class_names)):
+        mask = hc_wrong & (y_pred == c)
+        n = mask.sum()
+        if n > 0:
+            print(f"    {class_names[c]:<20s}: {n:>4d} wrongly predicted with high confidence")
+
+    # Top confused pairs among high-conf errors
+    from sklearn.metrics import confusion_matrix
+    cm_hc = confusion_matrix(
+        y_true[hc_wrong], y_pred[hc_wrong], labels=list(range(len(class_names)))
+    )
+    np.fill_diagonal(cm_hc, 0)
+    print(f"\n  Top high-confidence confusion pairs:")
+    flat = np.argsort(cm_hc.ravel())[::-1][:5]
+    for idx in flat:
+        tc = idx // len(class_names)
+        pc = idx % len(class_names)
+        cnt = cm_hc[tc, pc]
+        if cnt == 0:
+            break
+        print(f"    {class_names[tc]} -> {class_names[pc]}: {cnt}")
+
+    # Save plot
+    if save_dir:
+        save_dir.mkdir(parents=True, exist_ok=True)
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+        # True class breakdown
+        counts_true = [((hc_wrong) & (y_true == c)).sum() for c in range(len(class_names))]
+        axes[0].barh(class_names, counts_true, color="tomato")
+        axes[0].set_xlabel("Count")
+        axes[0].set_title("High-Confidence Errors by True Class")
+
+        # Predicted class breakdown
+        counts_pred = [((hc_wrong) & (y_pred == c)).sum() for c in range(len(class_names))]
+        axes[1].barh(class_names, counts_pred, color="steelblue")
+        axes[1].set_xlabel("Count")
+        axes[1].set_title("High-Confidence Errors by Predicted Class")
+
+        plt.tight_layout()
+        path = save_dir / "high_confidence_errors.png"
+        fig.savefig(path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+        print(f"  Plot saved to {path}")
+
+
+def shap_analysis(
+    model,
+    X_val: np.ndarray,
+    feature_names: list[str],
+    class_names: list[str] | None = None,
+    save_dir: Path | None = None,
+    max_display: int = 20,
+    n_samples: int = 500,
+) -> None:
+    """Compute SHAP values and generate summary plot."""
+    try:
+        import shap
+    except ImportError:
+        logger.warning("shap not installed -- skipping SHAP analysis")
+        return
+
+    if class_names is None:
+        class_names = CLASS_NAMES
+
     if save_dir:
         save_dir.mkdir(parents=True, exist_ok=True)
 
@@ -283,9 +391,8 @@ def shap_analysis(
         shap_arr = np.array(shap_values)  # (n_classes, n_samples, n_features)
         shap_mean_abs = np.abs(shap_arr).mean(axis=(0, 1))  # (n_features,)
     else:
-        # Shape: (n_samples, n_features, n_classes) -- LightGBM TreeExplainer
         if shap_values.ndim == 3:
-            shap_arr = shap_values.transpose(2, 0, 1)  # (n_classes, n_samples, n_features)
+            # Shape: (n_samples, n_features, n_classes)
             shap_mean_abs = np.abs(shap_values).mean(axis=(0, 2))
         else:
             shap_mean_abs = np.abs(shap_values).mean(axis=0)
@@ -323,7 +430,7 @@ if __name__ == "__main__":
     import joblib
     from sklearn.model_selection import StratifiedShuffleSplit
     from src.data_loading import load_all_sequences, SEED
-    from src.training import _fmt_time
+    from src.training import fmt_time
 
     logging.basicConfig(
         level=logging.INFO,
@@ -357,59 +464,66 @@ if __name__ == "__main__":
     df = load_all_sequences(project_root)
     y = df["label"].values
 
-    feat_file = "esm2_embeddings.npy" if "ESM" in feature_source else "handcrafted_features.npy"
-    X = np.load(features_dir / feat_file)
+    esm_model_name = artifact.get("esm_model_name", "esm2_t6_8M_UR50D")
 
-    names_path = features_dir / "feature_names.npy"
-    if "ESM" in feature_source:
-        # ESM-2 embedding dimensions don't have handcrafted names
+    # Build feature matrix matching feature_source
+    if "Physicochemical" in feature_source and "ESM" in feature_source:
+        # ESM-2 + Physicochemical (primary combo from advanced.py)
+        from src.features.embeddings import get_cache_filename
+        esm_file = get_cache_filename(esm_model_name)
+        esm_X = np.load(features_dir / esm_file)
+        hc_path = features_dir / "handcrafted_features.npy"
+        if hc_path.exists():
+            hc_X = np.load(hc_path)
+            physico_X = hc_X[:, -8:]  # last 8 cols = physicochemical
+        else:
+            from src.features.physicochemical import extract_physicochemical_features
+            seqs = df["sequence"].tolist()
+            physico_X = extract_physicochemical_features(seqs)
+        X = np.hstack([esm_X, physico_X])
+        esm_dim = esm_X.shape[1]
+        physico_names = ["charge", "hydro_mean", "hydro_std", "MW", "pI",
+                         "arom", "instability", "gravy"]
+        feature_names = [f"ESM_{i}" for i in range(esm_dim)] + physico_names
+    elif "ESM" in feature_source:
+        from src.features.embeddings import get_cache_filename
+        esm_file = get_cache_filename(esm_model_name)
+        X = np.load(features_dir / esm_file)
         feature_names = [f"ESM_{i}" for i in range(X.shape[1])]
-    elif names_path.exists():
-        feature_names = np.load(names_path, allow_pickle=True).tolist()
     else:
-        feature_names = [f"f{i}" for i in range(X.shape[1])]
+        X = np.load(features_dir / "handcrafted_features.npy")
+        names_path = features_dir / "feature_names.npy"
+        if names_path.exists():
+            feature_names = np.load(names_path, allow_pickle=True).tolist()
+        else:
+            feature_names = [f"f{i}" for i in range(X.shape[1])]
     print(f"Features: {X.shape}  |  Names: {len(feature_names)}")
 
-    # Stratified 20% hold-out
+    # Stratified 20% hold-out for feature importance & SHAP
     sss = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=SEED)
     train_idx, val_idx = next(sss.split(X, y))
 
-    # -- Prefer saved OOF predictions for honest evaluation --------------------
+    # Scale validation features using the artifact scaler (matches training)
+    X_val = scaler.transform(X[val_idx])
+    y_val = y[val_idx]
+
+    # -- Prefer saved OOF predictions for confusion analysis -------------------
     oof_preds = artifact.get("oof_preds")
     oof_proba = artifact.get("oof_proba")
     oof_true = artifact.get("oof_true")
 
     if oof_preds is not None and oof_true is not None:
         print("Using OOF (out-of-fold) predictions from CV - honest held-out evaluation.")
-        y_val = oof_true
-        y_pred = oof_preds
-        y_proba = oof_proba
-        # For feature importance we still need a properly scaled val set
-        from sklearn.preprocessing import StandardScaler as _SS
-        _sc_eval = _SS()
-        _sc_eval.fit(X[train_idx])
-        X_val = _sc_eval.transform(X[val_idx])
+        y_eval = oof_true
+        y_pred_eval = oof_preds
+        y_proba_eval = oof_proba
     else:
-        print("WARNING: OOF predictions not in model artifact.")
-        print("  Re-run 'python -m src.models.advanced' to save OOF predictions.")
-        print("  Falling back to held-out split with fresh scaler (honest eval).")
-        from sklearn.preprocessing import StandardScaler as _SS
-        _sc_eval = _SS()
-        _sc_eval.fit(X[train_idx])
-        X_val = _sc_eval.transform(X[val_idx])
-        y_val = y[val_idx]
-        y_pred = model.predict(X_val)
-        y_proba = model.predict_proba(X_val) if hasattr(model, "predict_proba") else None
-        print("  Note: confusion analysis uses full-data-trained model on held-out split.")
+        print("WARNING: OOF predictions not in model artifact. Using held-out split.")
+        y_eval = y_val
+        y_pred_eval = model.predict(X_val)
+        y_proba_eval = model.predict_proba(X_val) if hasattr(model, "predict_proba") else None
 
-    print(f"Evaluation set: {len(y_val):,} samples  [{_fmt_time(time.time()-t0)}]")
-
-    # -- Predict for feature importance (always from fresh scaler) -------------
-    if "X_val" not in dir():
-        from sklearn.preprocessing import StandardScaler as _SS
-        _sc_eval = _SS()
-        _sc_eval.fit(X[train_idx])
-        X_val = _sc_eval.transform(X[val_idx])
+    print(f"Evaluation set: {len(y_eval):,} samples  [{fmt_time(time.time()-t0)}]")
 
     # -- 1. Feature importance -------------------------------------------------
     print(f"\n{'='*72}")
@@ -432,11 +546,23 @@ if __name__ == "__main__":
     print("  CLASS CONFUSION ANALYSIS")
     print(f"{'='*72}")
     class_confusion_analysis(
-        y_val, y_pred, y_proba,
+        y_eval, y_pred_eval, y_proba_eval,
         save_dir=figures_dir,
     )
 
-    # -- 3. SHAP analysis ------------------------------------------------------
+    # -- 3. High-confidence error analysis ----------------------------------------
+    print(f"\n{'='*72}")
+    print("  HIGH-CONFIDENCE ERROR ANALYSIS")
+    print(f"{'='*72}")
+    if y_proba_eval is not None:
+        high_confidence_error_analysis(
+            y_eval, y_pred_eval, y_proba_eval,
+            save_dir=figures_dir,
+        )
+    else:
+        print("  Skipped -- no probability data available.")
+
+    # -- 4. SHAP analysis ------------------------------------------------------
     print(f"\n{'='*72}")
     print("  SHAP ANALYSIS")
     print(f"{'='*72}")
@@ -447,4 +573,47 @@ if __name__ == "__main__":
         n_samples=1000,
     )
 
-    print(f"\nTotal interpretability time: {_fmt_time(time.time()-t0)}")
+    # -- Persist structured results to JSON ------------------------------------
+    from sklearn.metrics import precision_recall_fscore_support, confusion_matrix as sk_cm
+    from src.evaluation import save_results_json
+
+    prec, rec, f1_arr, sup = precision_recall_fscore_support(
+        y_eval, y_pred_eval, labels=list(range(len(CLASS_NAMES))), zero_division=0
+    )
+    per_class = [
+        {"class": CLASS_NAMES[i], "precision": float(prec[i]),
+         "recall": float(rec[i]), "f1": float(f1_arr[i]), "support": int(sup[i])}
+        for i in range(len(CLASS_NAMES))
+    ]
+
+    # Top-30 importance
+    top30 = sorted(importance_dict.items(), key=lambda x: x[1], reverse=True)[:30]
+
+    # High-confidence error counts
+    hc_data = {}
+    if y_proba_eval is not None:
+        max_p = y_proba_eval.max(axis=1)
+        wrong = y_eval != y_pred_eval
+        hc_wrong = wrong & (max_p >= 0.80)
+        hc_data = {
+            "total_errors": int(wrong.sum()),
+            "high_conf_errors": int(hc_wrong.sum()),
+            "by_true_class": {
+                CLASS_NAMES[c]: int((hc_wrong & (y_eval == c)).sum())
+                for c in range(len(CLASS_NAMES))
+            },
+            "by_pred_class": {
+                CLASS_NAMES[c]: int((hc_wrong & (y_pred_eval == c)).sum())
+                for c in range(len(CLASS_NAMES))
+            },
+        }
+
+    interp_data = {
+        "feature_source": feature_source,
+        "per_class_metrics": per_class,
+        "top_features": [{"name": n, "importance": float(v)} for n, v in top30],
+        "high_confidence_errors": hc_data,
+    }
+    save_results_json(interp_data, project_root / "outputs" / "interpretability_results.json")
+
+    print(f"\nTotal interpretability time: {fmt_time(time.time()-t0)}")

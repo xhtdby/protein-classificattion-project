@@ -1,0 +1,198 @@
+{
+  "feature_source": "ESM-2 + Physicochemical",
+  "per_class_metrics": [
+    {
+      "class": "Not enzyme",
+      "precision": 0.9344176608043291,
+      "recall": 0.9377044122184511,
+      "f1": 0.9360581513536822,
+      "support": 32410
+    },
+    {
+      "class": "Oxidoreductase",
+      "precision": 0.5861526357199056,
+      "recall": 0.629222972972973,
+      "f1": 0.6069246435845214,
+      "support": 1184
+    },
+    {
+      "class": "Transferase",
+      "precision": 0.57888,
+      "recall": 0.6533044420368364,
+      "f1": 0.6138445877163217,
+      "support": 2769
+    },
+    {
+      "class": "Hydrolase",
+      "precision": 0.5542617605961807,
+      "recall": 0.5645161290322581,
+      "f1": 0.5593419506462984,
+      "support": 2108
+    },
+    {
+      "class": "Lyase",
+      "precision": 0.32857142857142857,
+      "recall": 0.19166666666666668,
+      "f1": 0.24210526315789474,
+      "support": 600
+    },
+    {
+      "class": "Isomerase",
+      "precision": 0.5540540540540541,
+      "recall": 0.19951338199513383,
+      "f1": 0.29338103756708406,
+      "support": 411
+    },
+    {
+      "class": "Ligase",
+      "precision": 0.6030150753768844,
+      "recall": 0.425531914893617,
+      "f1": 0.498960498960499,
+      "support": 282
+    }
+  ],
+  "top_features": [
+    {
+      "name": "ESM_112",
+      "importance": 0.01791134849190712
+    },
+    {
+      "name": "ESM_308",
+      "importance": 0.009138577617704868
+    },
+    {
+      "name": "ESM_216",
+      "importance": 0.008684112690389156
+    },
+    {
+      "name": "ESM_179",
+      "importance": 0.008461114950478077
+    },
+    {
+      "name": "charge",
+      "importance": 0.007684779353439808
+    },
+    {
+      "name": "ESM_187",
+      "importance": 0.007227324414998293
+    },
+    {
+      "name": "ESM_317",
+      "importance": 0.007000149227678776
+    },
+    {
+      "name": "ESM_58",
+      "importance": 0.0069249412044882774
+    },
+    {
+      "name": "ESM_38",
+      "importance": 0.0069162072613835335
+    },
+    {
+      "name": "ESM_119",
+      "importance": 0.006844822783023119
+    },
+    {
+      "name": "ESM_14",
+      "importance": 0.006794559769332409
+    },
+    {
+      "name": "ESM_161",
+      "importance": 0.0066394442692399025
+    },
+    {
+      "name": "ESM_7",
+      "importance": 0.005742407403886318
+    },
+    {
+      "name": "ESM_61",
+      "importance": 0.005585649516433477
+    },
+    {
+      "name": "ESM_34",
+      "importance": 0.005311400629580021
+    },
+    {
+      "name": "ESM_248",
+      "importance": 0.005277407355606556
+    },
+    {
+      "name": "ESM_315",
+      "importance": 0.005206445697695017
+    },
+    {
+      "name": "ESM_150",
+      "importance": 0.005144011229276657
+    },
+    {
+      "name": "ESM_318",
+      "importance": 0.005143504589796066
+    },
+    {
+      "name": "ESM_157",
+      "importance": 0.005016253795474768
+    },
+    {
+      "name": "ESM_306",
+      "importance": 0.005013219080865383
+    },
+    {
+      "name": "ESM_62",
+      "importance": 0.00494132237508893
+    },
+    {
+      "name": "ESM_29",
+      "importance": 0.004843865521252155
+    },
+    {
+      "name": "ESM_247",
+      "importance": 0.004823531489819288
+    },
+    {
+      "name": "ESM_59",
+      "importance": 0.004728246014565229
+    },
+    {
+      "name": "ESM_312",
+      "importance": 0.004655092488974333
+    },
+    {
+      "name": "ESM_89",
+      "importance": 0.0046468148939311504
+    },
+    {
+      "name": "ESM_98",
+      "importance": 0.004643392749130726
+    },
+    {
+      "name": "ESM_311",
+      "importance": 0.0046362001448869705
+    },
+    {
+      "name": "ESM_255",
+      "importance": 0.0045281569473445415
+    }
+  ],
+  "high_confidence_errors": {
+    "total_errors": 5312,
+    "high_conf_errors": 1499,
+    "by_true_class": {
+      "Not enzyme": 551,
+      "Oxidoreductase": 102,
+      "Transferase": 311,
+      "Hydrolase": 320,
+      "Lyase": 114,
+      "Isomerase": 88,
+      "Ligase": 13
+    },
+    "by_pred_class": {
+      "Not enzyme": 785,
+      "Oxidoreductase": 171,
+      "Transferase": 239,
+      "Hydrolase": 253,
+      "Lyase": 22,
+      "Isomerase": 10,
+      "Ligase": 19
+    }
+  }
+}
