@@ -173,7 +173,8 @@ if __name__ == "__main__":
     esm_model_name = artifact.get("esm_model_name", "esm2_t6_8M_UR50D")
 
     # Build feature matrix matching feature_source
-    if "Physicochemical" in feature_source and "ESM" in feature_source:
+    source_lower = feature_source.lower()
+    if "physicochemical" in source_lower and "esm" in source_lower:
         from src.features.embeddings import get_cache_filename
         esm_file = get_cache_filename(esm_model_name)
         esm_X = np.load(features_dir / esm_file)
@@ -186,7 +187,7 @@ if __name__ == "__main__":
             seqs = df["sequence"].tolist()
             physico_X = extract_physicochemical_features(seqs)
         X = np.hstack([esm_X, physico_X])
-    elif "ESM" in feature_source:
+    elif "esm" in source_lower:
         from src.features.embeddings import get_cache_filename
         esm_file = get_cache_filename(esm_model_name)
         X = np.load(features_dir / esm_file)

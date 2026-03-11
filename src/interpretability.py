@@ -20,6 +20,7 @@ from sklearn.inspection import permutation_importance
 
 from src.data_loading import CLASS_NAMES
 from src.evaluation import compute_metrics
+from src.features.physicochemical import FEATURE_NAMES as PHYSICO_FEATURE_NAMES
 
 logger = logging.getLogger(__name__)
 
@@ -214,39 +215,6 @@ def class_confusion_analysis(
         fig.savefig(save_dir / "per_class_metrics.png", dpi=150, bbox_inches="tight")
         plt.close(fig)
         print(f"Per-class metrics plot saved to {save_dir / 'per_class_metrics.png'}")
-
-
-def shap_analysis(
-    model,
-    X_val: np.ndarray,
-    feature_names: list[str],
-    class_names: list[str] | None = None,
-    save_dir: Path | None = None,
-    max_display: int = 20,
-    n_samples: int = 500,
-) -> None:
-    """Compute SHAP values and generate summary plot.
-
-    Uses TreeExplainer for tree-based models (fast), falls back to sampling
-    for other models.
-
-    Args:
-        model: Fitted model.
-        X_val: Validation features (will subsample if large).
-        feature_names: Names for each feature column.
-        class_names: Class label names.
-        save_dir: Directory to save output plots.
-        max_display: Max features to show in SHAP plot.
-        n_samples: Max samples to compute SHAP values for (speed).
-    """
-    try:
-        import shap
-    except ImportError:
-        logger.warning("shap not installed -- skipping SHAP analysis")
-        return
-
-    if class_names is None:
-        class_names = CLASS_NAMES
 
 
 def high_confidence_error_analysis(
@@ -467,7 +435,8 @@ if __name__ == "__main__":
     esm_model_name = artifact.get("esm_model_name", "esm2_t6_8M_UR50D")
 
     # Build feature matrix matching feature_source
-    if "Physicochemical" in feature_source and "ESM" in feature_source:
+    source_lower = feature_source.lower()
+    if "physicochemical" in source_lower and "esm" in source_lower:
         # ESM-2 + Physicochemical (primary combo from advanced.py)
         from src.features.embeddings import get_cache_filename
         esm_file = get_cache_filename(esm_model_name)
@@ -482,10 +451,8 @@ if __name__ == "__main__":
             physico_X = extract_physicochemical_features(seqs)
         X = np.hstack([esm_X, physico_X])
         esm_dim = esm_X.shape[1]
-        physico_names = ["charge", "hydro_mean", "hydro_std", "MW", "pI",
-                         "arom", "instability", "gravy"]
-        feature_names = [f"ESM_{i}" for i in range(esm_dim)] + physico_names
-    elif "ESM" in feature_source:
+        feature_names = [f"ESM_{i}" for i in range(esm_dim)] + list(PHYSICO_FEATURE_NAMES)
+    elif "esm" in source_lower:
         from src.features.embeddings import get_cache_filename
         esm_file = get_cache_filename(esm_model_name)
         X = np.load(features_dir / esm_file)

@@ -448,6 +448,7 @@ if __name__ == "__main__":
     joblib.dump({
         "model": final, "scaler": scaler, "feature_source": feature_source,
         "esm_model_name": esm_model_name,
+        "esm_embedding_dim": esm_X.shape[1],
         "xgb_params": best_xgb_params if "XGBoost" in best_name else {},
         "thresholds": thresholds,
         "oof_preds": best["oof_preds"], "oof_proba": best["oof_proba"],

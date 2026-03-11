@@ -99,10 +99,11 @@ def predict_blind(
     scaler = artefact["scaler"]
     feature_source = artefact.get("feature_source", "Handcrafted")
     esm_model_name = artefact.get("esm_model_name", "esm2_t6_8M_UR50D")
+    expected_dim = artefact.get("esm_embedding_dim")
     thresholds = artefact.get("thresholds")  # per-class decision thresholds
 
-    logger.info("Loaded model from %s (feature source: %s, ESM: %s)",
-                model_path, feature_source, esm_model_name)
+    logger.info("Loaded model from %s (feature source: %s, ESM: %s, expected_dim: %s)",
+                model_path, feature_source, esm_model_name, expected_dim)
 
     # Parse FASTA
     seq_ids, sequences = load_fasta_sequences(fasta_path)
