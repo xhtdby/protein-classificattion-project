@@ -9,8 +9,7 @@ __pycache__/
 # Large cached features (regenerate with scripts)
 outputs/features/*.npy
 
-# Temporary logs
-*.log
+# Temporary scratch logs (not results)
 advanced_esm_log.txt
 interp_log.txt
 outputs/interp_log*.txt
@@ -26,6 +25,11 @@ outputs/test_stdout.txt
 Thumbs.db
 .DS_Store
 
-# Model artifacts (large binary files)
+# Model artifacts (large binary files — download via pod_download.ps1)
 outputs/models/*.joblib
 outputs/models/*.pt
+
+# Allow result JSONs, figures, and run logs
+!outputs/*.json
+!outputs/figures/*.png
+!outputs/*.txt

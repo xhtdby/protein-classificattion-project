@@ -9,6 +9,27 @@ set -e
 
 REPO="https://github.com/xhtdby/protein-classificattion-project.git"
 WORKDIR="/workspace/protein-classification"
+SESSION="protein"   # tmux session name
+
+# ── 0. Ensure tmux is available ───────────────────────────────────────────────
+if ! command -v tmux &>/dev/null; then
+    echo "Installing tmux..."
+    apt-get install -y -q tmux 2>/dev/null || yum install -y tmux 2>/dev/null || true
+fi
+
+# If we are NOT already inside the tmux session, re-launch inside it
+if [ -z "$TMUX" ]; then
+    echo ""
+    echo "  Launching inside tmux session '$SESSION' so SSH disconnects won't stop the job."
+    echo "  To reattach later:  tmux attach -t $SESSION"
+    echo ""
+    tmux new-session -d -s "$SESSION" -x 220 -y 50 2>/dev/null || true
+    tmux send-keys -t "$SESSION" "bash $WORKDIR/pod_setup.sh" Enter 2>/dev/null || \
+        tmux send-keys -t "$SESSION" "cd $WORKDIR && bash pod_setup.sh" Enter
+    echo "  Job is running inside tmux. SSH safely — rejoin with:"
+    echo "    tmux attach -t $SESSION"
+    exit 0
+fi
 
 echo "========================================"
 echo "  POD SETUP — protein classification"
@@ -77,6 +98,9 @@ fi
 echo "[5/5] Starting advanced training with 650M ESM-2..."
 echo "  Command: python -m src.models.advanced --esm-model 650M --tune --tune-iter 30"
 echo ""
+echo "  Running inside tmux — you can safely disconnect."
+echo "  Reattach anytime:  tmux attach -t $SESSION"
+echo ""
 
 python -u -m src.models.advanced --esm-model 650M --tune --tune-iter 30 \
     2>&1 | tee outputs/advanced_650M_run.txt
@@ -87,3 +111,16 @@ echo "  TRAINING COMPLETE"
 echo "========================================"
 echo "Results: outputs/advanced_results.json"
 echo "Model:   outputs/models/best_model.joblib"
+echo ""
+
+# ── 6. Push results to GitHub ─────────────────────────────────────────────────
+echo "Pushing results to GitHub..."
+git config user.email "pod@results.local"
+git config user.name "pod"
+git add outputs/*.json outputs/figures/*.png outputs/*.txt 2>/dev/null || true
+git commit -m "results: 650M ESM-2 + tuning on pod" 2>/dev/null || echo "Nothing new to commit"
+git push origin main && echo "  Pushed to GitHub." || echo "  Push failed — run pod_download.ps1 to scp files."
+
+echo ""
+echo "Download the model artifact to your local machine:"
+echo "  .\\pod_download.ps1 -PodHost \"\$HOST\" -Port \$PORT"
