@@ -1,0 +1,606 @@
+
+========================================================================
+  HARDWARE
+========================================================================
+  CUDA          : True
+  MPS           : False
+  GPU           : NVIDIA GeForce RTX 5090
+  VRAM          : 33.7 GB
+  XGBoost dev   : cuda
+========================================================================
+
+Loading sequences...
+  Loaded 39,764 sequences  [0s]
+  Loaded Handcrafted features: shape=(39764, 429)
+  Loaded ESM-2 features: shape=(39764, 1280)
+  Primary features: ESM-2 + Physico  shape=(39764, 1288)
+
+========================================================================
+  HYPERPARAMETER TUNING — 30 XGBoost configurations
+========================================================================
+
+------------------------------------------------------------------------
+  Training: Tune [1/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8909  F1=0.5810  BA=0.5162  MCC=0.6369  [26s | ETA 1m 45s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8862  F1=0.5666  BA=0.5138  MCC=0.6217  [20s | ETA 1m 9s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8871  F1=0.5782  BA=0.5252  MCC=0.6267  [20s | ETA 44s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8851  F1=0.5631  BA=0.5099  MCC=0.6185  [20s | ETA 22s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8828  F1=0.5723  BA=0.5173  MCC=0.6068  [20s | ETA 0s]
+  Total CV time: 1m 46s
+  [ 1/30] F1=0.5722  max_depth=6 | n_estimators=800 | learning_rate=0.1 | subsample=0.7 | colsample_bytree=0.7 ** NEW BEST
+
+------------------------------------------------------------------------
+  Training: Tune [2/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8809  F1=0.5666  BA=0.5168  MCC=0.6211  [16s | ETA 1m 4s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8788  F1=0.5341  BA=0.5002  MCC=0.6144  [16s | ETA 49s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8803  F1=0.5597  BA=0.5173  MCC=0.6195  [16s | ETA 32s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8772  F1=0.5415  BA=0.5070  MCC=0.6095  [16s | ETA 16s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8791  F1=0.5442  BA=0.4991  MCC=0.6081  [16s | ETA 0s]
+  Total CV time: 1m 20s
+  [ 2/30] F1=0.5492  max_depth=6 | n_estimators=500 | learning_rate=0.05 | subsample=0.7 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [3/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8691  F1=0.5615  BA=0.5316  MCC=0.6092  [12s | ETA 47s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8685  F1=0.5289  BA=0.5083  MCC=0.6075  [11s | ETA 35s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8690  F1=0.5607  BA=0.5410  MCC=0.6147  [11s | ETA 23s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8672  F1=0.5391  BA=0.5209  MCC=0.6056  [11s | ETA 11s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8666  F1=0.5389  BA=0.5158  MCC=0.5979  [12s | ETA 0s]
+  Total CV time: 57s
+  [ 3/30] F1=0.5458  max_depth=6 | n_estimators=300 | learning_rate=0.05 | subsample=0.8 | colsample_bytree=0.8
+
+------------------------------------------------------------------------
+  Training: Tune [4/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8819  F1=0.5591  BA=0.4857  MCC=0.5980  [18s | ETA 1m 13s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8794  F1=0.5305  BA=0.4718  MCC=0.5911  [19s | ETA 56s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8795  F1=0.5330  BA=0.4719  MCC=0.5919  [18s | ETA 37s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8755  F1=0.5229  BA=0.4663  MCC=0.5773  [18s | ETA 18s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8735  F1=0.5200  BA=0.4599  MCC=0.5656  [18s | ETA 0s]
+  Total CV time: 1m 32s
+  [ 4/30] F1=0.5331  max_depth=8 | n_estimators=300 | learning_rate=0.1 | subsample=0.9 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [5/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8549  F1=0.5670  BA=0.5762  MCC=0.6125  [5s | ETA 22s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8559  F1=0.5503  BA=0.5662  MCC=0.6093  [6s | ETA 17s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8510  F1=0.5829  BA=0.5985  MCC=0.6037  [5s | ETA 11s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8540  F1=0.5574  BA=0.5675  MCC=0.6077  [5s | ETA 5s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8527  F1=0.5655  BA=0.5747  MCC=0.5989  [5s | ETA 0s]
+  Total CV time: 27s
+  [ 5/30] F1=0.5646  max_depth=4 | n_estimators=300 | learning_rate=0.1 | subsample=0.7 | colsample_bytree=0.8
+
+------------------------------------------------------------------------
+  Training: Tune [6/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8536  F1=0.5631  BA=0.5714  MCC=0.6049  [5s | ETA 21s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8573  F1=0.5557  BA=0.5709  MCC=0.6139  [5s | ETA 16s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8515  F1=0.5800  BA=0.5906  MCC=0.6058  [5s | ETA 10s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8548  F1=0.5647  BA=0.5797  MCC=0.6097  [5s | ETA 5s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8507  F1=0.5454  BA=0.5595  MCC=0.5948  [5s | ETA 0s]
+  Total CV time: 26s
+  [ 6/30] F1=0.5618  max_depth=4 | n_estimators=300 | learning_rate=0.1 | subsample=0.8 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [7/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8451  F1=0.5554  BA=0.5720  MCC=0.5944  [8s | ETA 34s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8509  F1=0.5451  BA=0.5675  MCC=0.6048  [8s | ETA 25s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8465  F1=0.5750  BA=0.5986  MCC=0.6009  [8s | ETA 17s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8470  F1=0.5567  BA=0.5816  MCC=0.6002  [8s | ETA 8s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8470  F1=0.5674  BA=0.5872  MCC=0.5964  [8s | ETA 0s]
+  Total CV time: 42s
+  [ 7/30] F1=0.5599  max_depth=4 | n_estimators=500 | learning_rate=0.05 | subsample=0.9 | colsample_bytree=0.8
+
+------------------------------------------------------------------------
+  Training: Tune [8/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8812  F1=0.5610  BA=0.4932  MCC=0.5979  [28s | ETA 1m 51s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8787  F1=0.5306  BA=0.4768  MCC=0.5897  [28s | ETA 1m 23s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8807  F1=0.5475  BA=0.4883  MCC=0.5987  [28s | ETA 56s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8761  F1=0.5268  BA=0.4747  MCC=0.5822  [28s | ETA 28s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8769  F1=0.5473  BA=0.4836  MCC=0.5806  [28s | ETA 0s]
+  Total CV time: 2m 19s
+  [ 8/30] F1=0.5426  max_depth=8 | n_estimators=500 | learning_rate=0.05 | subsample=0.7 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [9/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8812  F1=0.5496  BA=0.4816  MCC=0.5951  [17s | ETA 1m 6s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8775  F1=0.5185  BA=0.4658  MCC=0.5854  [16s | ETA 49s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8787  F1=0.5424  BA=0.4804  MCC=0.5902  [16s | ETA 33s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8761  F1=0.5236  BA=0.4708  MCC=0.5819  [16s | ETA 16s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8766  F1=0.5366  BA=0.4799  MCC=0.5803  [16s | ETA 0s]
+  Total CV time: 1m 21s
+  [ 9/30] F1=0.5342  max_depth=8 | n_estimators=300 | learning_rate=0.1 | subsample=0.7 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [10/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8902  F1=0.6009  BA=0.5347  MCC=0.6348  [21s | ETA 1m 23s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8876  F1=0.5653  BA=0.5122  MCC=0.6265  [22s | ETA 1m 4s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8891  F1=0.5977  BA=0.5391  MCC=0.6340  [21s | ETA 43s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8831  F1=0.5532  BA=0.5016  MCC=0.6111  [21s | ETA 21s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8815  F1=0.5627  BA=0.5048  MCC=0.6021  [21s | ETA 0s]
+  Total CV time: 1m 45s
+  [10/30] F1=0.5760  max_depth=6 | n_estimators=800 | learning_rate=0.1 | subsample=0.7 | colsample_bytree=0.8 ** NEW BEST
+
+------------------------------------------------------------------------
+  Training: Tune [11/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.7577  F1=0.4545  BA=0.5735  MCC=0.4677  [9s | ETA 35s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.7661  F1=0.4537  BA=0.5537  MCC=0.4767  [9s | ETA 26s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.7569  F1=0.4464  BA=0.5671  MCC=0.4650  [9s | ETA 18s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.7547  F1=0.4377  BA=0.5569  MCC=0.4625  [9s | ETA 9s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.7538  F1=0.4437  BA=0.5609  MCC=0.4595  [9s | ETA 0s]
+  Total CV time: 44s
+  [11/30] F1=0.4472  max_depth=4 | n_estimators=500 | learning_rate=0.01 | subsample=0.7 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [12/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8460  F1=0.5590  BA=0.5734  MCC=0.5955  [8s | ETA 34s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8496  F1=0.5495  BA=0.5714  MCC=0.6016  [9s | ETA 26s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8463  F1=0.5763  BA=0.5993  MCC=0.6014  [8s | ETA 17s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8489  F1=0.5602  BA=0.5817  MCC=0.6040  [8s | ETA 8s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8462  F1=0.5611  BA=0.5789  MCC=0.5921  [8s | ETA 0s]
+  Total CV time: 42s
+  [12/30] F1=0.5612  max_depth=4 | n_estimators=500 | learning_rate=0.05 | subsample=0.9 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [13/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8699  F1=0.5488  BA=0.5116  MCC=0.5945  [1m 0s | ETA 4m 2s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8690  F1=0.5208  BA=0.4923  MCC=0.5922  [60s | ETA 3m 0s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8719  F1=0.5486  BA=0.5192  MCC=0.6036  [1m 0s | ETA 2m 0s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8660  F1=0.5312  BA=0.5033  MCC=0.5822  [56s | ETA 59s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8661  F1=0.5252  BA=0.4939  MCC=0.5771  [1m 0s | ETA 0s]
+  Total CV time: 4m 57s
+  [13/30] F1=0.5349  max_depth=8 | n_estimators=800 | learning_rate=0.01 | subsample=0.8 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [14/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8838  F1=0.5675  BA=0.5196  MCC=0.6303  [17s | ETA 1m 9s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8793  F1=0.5372  BA=0.4962  MCC=0.6140  [17s | ETA 52s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8794  F1=0.5541  BA=0.5102  MCC=0.6148  [17s | ETA 34s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8787  F1=0.5455  BA=0.5045  MCC=0.6117  [17s | ETA 17s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8781  F1=0.5527  BA=0.5039  MCC=0.6064  [17s | ETA 0s]
+  Total CV time: 1m 25s
+  [14/30] F1=0.5514  max_depth=6 | n_estimators=500 | learning_rate=0.05 | subsample=0.7 | colsample_bytree=0.8
+
+------------------------------------------------------------------------
+  Training: Tune [15/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8565  F1=0.5418  BA=0.5311  MCC=0.5813  [43s | ETA 2m 50s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8557  F1=0.5125  BA=0.5047  MCC=0.5753  [45s | ETA 2m 11s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8579  F1=0.5404  BA=0.5328  MCC=0.5876  [43s | ETA 1m 26s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8539  F1=0.5206  BA=0.5123  MCC=0.5713  [43s | ETA 43s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8530  F1=0.5262  BA=0.5148  MCC=0.5630  [45s | ETA 0s]
+  Total CV time: 3m 38s
+  [15/30] F1=0.5283  max_depth=8 | n_estimators=500 | learning_rate=0.01 | subsample=0.8 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [16/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8790  F1=0.5459  BA=0.4736  MCC=0.5873  [17s | ETA 1m 8s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8767  F1=0.5099  BA=0.4564  MCC=0.5804  [18s | ETA 53s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8785  F1=0.5393  BA=0.4796  MCC=0.5884  [18s | ETA 36s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8751  F1=0.5060  BA=0.4535  MCC=0.5749  [16s | ETA 17s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8742  F1=0.5249  BA=0.4656  MCC=0.5699  [16s | ETA 0s]
+  Total CV time: 1m 26s
+  [16/30] F1=0.5252  max_depth=8 | n_estimators=300 | learning_rate=0.1 | subsample=0.9 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [17/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.7925  F1=0.4822  BA=0.5474  MCC=0.5018  [11s | ETA 44s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8051  F1=0.4938  BA=0.5488  MCC=0.5217  [11s | ETA 33s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.7959  F1=0.4790  BA=0.5463  MCC=0.5126  [12s | ETA 22s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.7958  F1=0.4781  BA=0.5386  MCC=0.5088  [11s | ETA 11s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.7872  F1=0.4785  BA=0.5472  MCC=0.4922  [11s | ETA 0s]
+  Total CV time: 56s
+  [17/30] F1=0.4823  max_depth=6 | n_estimators=300 | learning_rate=0.01 | subsample=0.9 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [18/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8848  F1=0.5873  BA=0.5166  MCC=0.6104  [37s | ETA 2m 27s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8827  F1=0.5482  BA=0.4926  MCC=0.6041  [37s | ETA 1m 51s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8836  F1=0.5646  BA=0.5036  MCC=0.6081  [37s | ETA 1m 14s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8784  F1=0.5354  BA=0.4816  MCC=0.5892  [37s | ETA 37s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8795  F1=0.5641  BA=0.4992  MCC=0.5898  [37s | ETA 0s]
+  Total CV time: 3m 5s
+  [18/30] F1=0.5599  max_depth=8 | n_estimators=800 | learning_rate=0.05 | subsample=0.7 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [19/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8699  F1=0.5727  BA=0.5423  MCC=0.6147  [10s | ETA 42s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8676  F1=0.5200  BA=0.5008  MCC=0.6029  [10s | ETA 31s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8697  F1=0.5586  BA=0.5347  MCC=0.6150  [11s | ETA 21s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8656  F1=0.5353  BA=0.5174  MCC=0.6001  [10s | ETA 11s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8656  F1=0.5318  BA=0.5099  MCC=0.5952  [11s | ETA 0s]
+  Total CV time: 53s
+  [19/30] F1=0.5437  max_depth=6 | n_estimators=300 | learning_rate=0.05 | subsample=0.9 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [20/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8709  F1=0.5578  BA=0.5306  MCC=0.6134  [12s | ETA 47s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8676  F1=0.5345  BA=0.5128  MCC=0.6053  [12s | ETA 35s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8680  F1=0.5511  BA=0.5327  MCC=0.6094  [12s | ETA 24s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8681  F1=0.5352  BA=0.5235  MCC=0.6087  [12s | ETA 12s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8661  F1=0.5235  BA=0.5031  MCC=0.5954  [12s | ETA 0s]
+  Total CV time: 59s
+  [20/30] F1=0.5404  max_depth=6 | n_estimators=300 | learning_rate=0.05 | subsample=0.8 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [21/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8827  F1=0.5596  BA=0.5032  MCC=0.6161  [11s | ETA 45s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8819  F1=0.5370  BA=0.4913  MCC=0.6146  [11s | ETA 33s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8789  F1=0.5521  BA=0.5000  MCC=0.6056  [11s | ETA 22s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8788  F1=0.5361  BA=0.4865  MCC=0.6027  [11s | ETA 11s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8790  F1=0.5370  BA=0.4850  MCC=0.5990  [11s | ETA 0s]
+  Total CV time: 56s
+  [21/30] F1=0.5444  max_depth=6 | n_estimators=300 | learning_rate=0.1 | subsample=0.9 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [22/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8885  F1=0.5801  BA=0.5161  MCC=0.6313  [16s | ETA 1m 5s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8827  F1=0.5481  BA=0.4987  MCC=0.6115  [17s | ETA 49s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8843  F1=0.5718  BA=0.5127  MCC=0.6150  [18s | ETA 34s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8814  F1=0.5527  BA=0.5036  MCC=0.6069  [16s | ETA 17s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8795  F1=0.5454  BA=0.4847  MCC=0.5958  [17s | ETA 0s]
+  Total CV time: 1m 24s
+  [22/30] F1=0.5596  max_depth=6 | n_estimators=500 | learning_rate=0.1 | subsample=0.8 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [23/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8842  F1=0.5746  BA=0.5163  MCC=0.6235  [11s | ETA 45s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8802  F1=0.5396  BA=0.4915  MCC=0.6091  [11s | ETA 33s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8817  F1=0.5585  BA=0.5079  MCC=0.6137  [11s | ETA 22s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8785  F1=0.5426  BA=0.4999  MCC=0.6064  [11s | ETA 11s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8760  F1=0.5330  BA=0.4799  MCC=0.5906  [12s | ETA 0s]
+  Total CV time: 56s
+  [23/30] F1=0.5496  max_depth=6 | n_estimators=300 | learning_rate=0.1 | subsample=0.8 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [24/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8826  F1=0.5594  BA=0.4841  MCC=0.5994  [46s | ETA 3m 3s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8807  F1=0.5378  BA=0.4805  MCC=0.5961  [1m 33s | ETA 3m 28s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8834  F1=0.5547  BA=0.4895  MCC=0.6048  [1m 47s | ETA 2m 44s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8765  F1=0.5238  BA=0.4699  MCC=0.5801  [1m 46s | ETA 1m 28s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8753  F1=0.5320  BA=0.4703  MCC=0.5730  [1m 39s | ETA 0s]
+  Total CV time: 7m 32s
+  [24/30] F1=0.5415  max_depth=8 | n_estimators=800 | learning_rate=0.05 | subsample=0.9 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [25/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8375  F1=0.5176  BA=0.5265  MCC=0.5498  [39s | ETA 2m 34s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8435  F1=0.5017  BA=0.5105  MCC=0.5616  [39s | ETA 1m 55s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8406  F1=0.5122  BA=0.5248  MCC=0.5597  [48s | ETA 1m 23s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8386  F1=0.5037  BA=0.5145  MCC=0.5528  [47s | ETA 43s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8355  F1=0.5101  BA=0.5180  MCC=0.5397  [47s | ETA 0s]
+  Total CV time: 3m 39s
+  [25/30] F1=0.5091  max_depth=8 | n_estimators=300 | learning_rate=0.01 | subsample=0.8 | colsample_bytree=0.8
+
+------------------------------------------------------------------------
+  Training: Tune [26/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8868  F1=0.5811  BA=0.5122  MCC=0.6180  [1m 9s | ETA 4m 37s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8833  F1=0.5551  BA=0.5023  MCC=0.6088  [1m 7s | ETA 3m 25s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8823  F1=0.5622  BA=0.5019  MCC=0.6043  [58s | ETA 2m 10s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8819  F1=0.5533  BA=0.4989  MCC=0.6031  [53s | ETA 1m 2s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8800  F1=0.5576  BA=0.4961  MCC=0.5923  [53s | ETA 0s]
+  Total CV time: 5m 1s
+  [26/30] F1=0.5619  max_depth=8 | n_estimators=800 | learning_rate=0.1 | subsample=0.7 | colsample_bytree=0.9
+
+------------------------------------------------------------------------
+  Training: Tune [27/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8394  F1=0.5202  BA=0.5258  MCC=0.5537  [38s | ETA 2m 30s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8448  F1=0.5120  BA=0.5175  MCC=0.5635  [43s | ETA 2m 0s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8402  F1=0.5102  BA=0.5257  MCC=0.5613  [41s | ETA 1m 21s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8392  F1=0.5030  BA=0.5149  MCC=0.5514  [47s | ETA 42s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8336  F1=0.5065  BA=0.5143  MCC=0.5342  [41s | ETA 0s]
+  Total CV time: 3m 29s
+  [27/30] F1=0.5104  max_depth=8 | n_estimators=300 | learning_rate=0.01 | subsample=0.7 | colsample_bytree=0.8
+
+------------------------------------------------------------------------
+  Training: Tune [28/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8431  F1=0.5403  BA=0.5539  MCC=0.5811  [1m 1s | ETA 4m 7s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8477  F1=0.5257  BA=0.5389  MCC=0.5864  [59s | ETA 3m 1s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8431  F1=0.5413  BA=0.5589  MCC=0.5838  [1m 7s | ETA 2m 5s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8436  F1=0.5379  BA=0.5501  MCC=0.5801  [1m 3s | ETA 1m 3s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8400  F1=0.5392  BA=0.5521  MCC=0.5696  [1m 2s | ETA 0s]
+  Total CV time: 5m 15s
+  [28/30] F1=0.5369  max_depth=6 | n_estimators=800 | learning_rate=0.01 | subsample=0.9 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [29/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8528  F1=0.5695  BA=0.5719  MCC=0.6055  [18s | ETA 1m 10s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8569  F1=0.5569  BA=0.5735  MCC=0.6141  [14s | ETA 48s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8513  F1=0.5734  BA=0.5895  MCC=0.6049  [13s | ETA 30s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8526  F1=0.5509  BA=0.5667  MCC=0.6049  [10s | ETA 14s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8535  F1=0.5580  BA=0.5669  MCC=0.6021  [10s | ETA 0s]
+  Total CV time: 1m 4s
+  [29/30] F1=0.5617  max_depth=4 | n_estimators=300 | learning_rate=0.1 | subsample=0.7 | colsample_bytree=0.7
+
+------------------------------------------------------------------------
+  Training: Tune [30/30]  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8759  F1=0.5477  BA=0.4836  MCC=0.5863  [33s | ETA 2m 12s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8759  F1=0.5316  BA=0.4833  MCC=0.5897  [38s | ETA 1m 46s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8787  F1=0.5471  BA=0.4910  MCC=0.5988  [43s | ETA 1m 15s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8741  F1=0.5246  BA=0.4776  MCC=0.5828  [38s | ETA 38s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8727  F1=0.5327  BA=0.4745  MCC=0.5730  [38s | ETA 0s]
+  Total CV time: 3m 9s
+  [30/30] F1=0.5367  max_depth=8 | n_estimators=300 | learning_rate=0.05 | subsample=0.7 | colsample_bytree=0.8
+
+  Best params: {'max_depth': 6, 'n_estimators': 800, 'learning_rate': 0.1, 'subsample': 0.7, 'colsample_bytree': 0.8}  (Macro F1=0.5760)
+
+============================================================
+  XGBoost-Tuned (ESM-2 + Physico) -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8863 +/- 0.0034
+  Macro F1:          0.5760 +/- 0.0195
+  Balanced Accuracy: 0.5185 +/- 0.0155
+  MCC:               0.6217 +/- 0.0130
+============================================================
+Confusion matrix saved to /workspace/protein-classification/outputs/figures/cm_xgboost_tuned.png
+
+------------------------------------------------------------------------
+  Training: XGBoost (ESM-2 + Physico)  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8902  F1=0.6009  BA=0.5347  MCC=0.6348  [49s | ETA 3m 14s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8876  F1=0.5653  BA=0.5122  MCC=0.6265  [48s | ETA 2m 25s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8891  F1=0.5977  BA=0.5391  MCC=0.6340  [47s | ETA 1m 36s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8831  F1=0.5532  BA=0.5016  MCC=0.6111  [48s | ETA 48s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8815  F1=0.5627  BA=0.5048  MCC=0.6021  [44s | ETA 0s]
+  Total CV time: 3m 56s
+
+============================================================
+  XGBoost (ESM-2 + Physico) -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8863 +/- 0.0034
+  Macro F1:          0.5760 +/- 0.0195
+  Balanced Accuracy: 0.5185 +/- 0.0155
+  MCC:               0.6217 +/- 0.0130
+============================================================
+Confusion matrix saved to /workspace/protein-classification/outputs/figures/cm_xgboost.png
+
+------------------------------------------------------------------------
+  Training: LightGBM (ESM-2 + Physico)  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8826  F1=0.5384  BA=0.4799  MCC=0.6161  [53s | ETA 3m 33s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8809  F1=0.5108  BA=0.4693  MCC=0.6142  [48s | ETA 2m 32s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8807  F1=0.5173  BA=0.4670  MCC=0.6087  [51s | ETA 1m 41s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8763  F1=0.5076  BA=0.4632  MCC=0.5959  [49s | ETA 50s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8765  F1=0.5021  BA=0.4544  MCC=0.5907  [51s | ETA 0s]
+  Total CV time: 4m 12s
+
+============================================================
+  LightGBM (ESM-2 + Physico) -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8794 +/- 0.0025
+  Macro F1:          0.5152 +/- 0.0126
+  Balanced Accuracy: 0.4668 +/- 0.0083
+  MCC:               0.6051 +/- 0.0101
+============================================================
+Confusion matrix saved to /workspace/protein-classification/outputs/figures/cm_lightgbm.png
+
+------------------------------------------------------------------------
+  Training: LightGBM+SMOTE (ESM-2 + Physico)  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  SMOTE... (2s, resampled to 181,496)  Acc=0.8828  F1=0.5910  BA=0.5412  MCC=0.6300  [2m 45s | ETA 11m 3s]
+  [Fold 2/5] train=31,811  val=7,953  SMOTE... (2s, resampled to 181,496)  Acc=0.8799  F1=0.5614  BA=0.5250  MCC=0.6205  [2m 53s | ETA 8m 29s]
+  [Fold 3/5] train=31,811  val=7,953  SMOTE... (2s, resampled to 181,496)  Acc=0.8797  F1=0.5937  BA=0.5516  MCC=0.6197  [2m 56s | ETA 5m 44s]
+  [Fold 4/5] train=31,811  val=7,953  SMOTE... (1m 13s, resampled to 181,496)  Acc=0.8768  F1=0.5611  BA=0.5240  MCC=0.6124  [4m 10s | ETA 3m 11s]
+  [Fold 5/5] train=31,812  val=7,952  SMOTE... (2m 53s, resampled to 181,496)  Acc=0.8809  F1=0.5740  BA=0.5315  MCC=0.6177  [5m 43s | ETA 0s]
+  Total CV time: 18m 30s
+
+============================================================
+  LightGBM+SMOTE (ESM-2 + Physico) -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8800 +/- 0.0020
+  Macro F1:          0.5763 +/- 0.0140
+  Balanced Accuracy: 0.5347 +/- 0.0105
+  MCC:               0.6201 +/- 0.0057
+============================================================
+Confusion matrix saved to /workspace/protein-classification/outputs/figures/cm_lightgbm_smote.png
+
+------------------------------------------------------------------------
+  Training: XGBoost+SMOTE (ESM-2 + Physico)  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  SMOTE... (1m 30s, resampled to 181,496)  Acc=0.8921  F1=0.6248  BA=0.5703  MCC=0.6513  [2m 59s | ETA 11m 59s]
+  [Fold 2/5] train=31,811  val=7,953  SMOTE... (39s, resampled to 181,496)  Acc=0.8886  F1=0.5905  BA=0.5521  MCC=0.6405  [2m 0s | ETA 7m 29s]
+  [Fold 3/5] train=31,811  val=7,953  SMOTE... (32s, resampled to 181,496)  Acc=0.8888  F1=0.6128  BA=0.5646  MCC=0.6403  [1m 44s | ETA 4m 29s]
+  [Fold 4/5] train=31,811  val=7,953  SMOTE... (1m 26s, resampled to 181,496)  Acc=0.8814  F1=0.5656  BA=0.5297  MCC=0.6163  [3m 13s | ETA 2m 29s]
+  [Fold 5/5] train=31,812  val=7,952  SMOTE... (22s, resampled to 181,496)  Acc=0.8867  F1=0.5929  BA=0.5488  MCC=0.6282  [2m 3s | ETA 0s]
+  Total CV time: 12m 1s
+
+============================================================
+  XGBoost+SMOTE (ESM-2 + Physico) -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8875 +/- 0.0035
+  Macro F1:          0.5973 +/- 0.0203
+  Balanced Accuracy: 0.5531 +/- 0.0141
+  MCC:               0.6353 +/- 0.0120
+============================================================
+Confusion matrix saved to /workspace/protein-classification/outputs/figures/cm_xgboost_smote.png
+
+========================================================================
+  FEATURE ABLATION STUDY
+========================================================================
+
+------------------------------------------------------------------------
+  Training: Ablation: ESM-2  |  Folds: 5  |  Features: 1280  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8897  F1=0.5900  BA=0.5301  MCC=0.6343  [1m 8s | ETA 4m 32s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8857  F1=0.5590  BA=0.5068  MCC=0.6200  [1m 5s | ETA 3m 19s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8851  F1=0.5733  BA=0.5199  MCC=0.6206  [1m 8s | ETA 2m 14s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8817  F1=0.5434  BA=0.4984  MCC=0.6066  [1m 6s | ETA 1m 6s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8832  F1=0.5659  BA=0.5093  MCC=0.6063  [1m 1s | ETA 0s]
+  Total CV time: 5m 29s
+
+============================================================
+  Ablation: ESM-2 -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8851 +/- 0.0027
+  Macro F1:          0.5663 +/- 0.0154
+  Balanced Accuracy: 0.5129 +/- 0.0110
+  MCC:               0.6176 +/- 0.0104
+============================================================
+
+------------------------------------------------------------------------
+  Training: Ablation: Handcrafted  |  Folds: 5  |  Features: 429  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8132  F1=0.2116  BA=0.1946  MCC=0.2239  [39s | ETA 2m 35s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8162  F1=0.1994  BA=0.1868  MCC=0.2309  [38s | ETA 1m 55s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8177  F1=0.2264  BA=0.2041  MCC=0.2444  [48s | ETA 1m 23s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8188  F1=0.2101  BA=0.1943  MCC=0.2487  [52s | ETA 44s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8163  F1=0.2066  BA=0.1920  MCC=0.2436  [52s | ETA 0s]
+  Total CV time: 3m 49s
+
+============================================================
+  Ablation: Handcrafted -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8164 +/- 0.0019
+  Macro F1:          0.2108 +/- 0.0089
+  Balanced Accuracy: 0.1944 +/- 0.0056
+  MCC:               0.2383 +/- 0.0093
+============================================================
+
+------------------------------------------------------------------------
+  Training: Ablation: ESM-2 + Handcrafted  |  Folds: 5  |  Features: 1709  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8886  F1=0.5799  BA=0.5137  MCC=0.6267  [1m 6s | ETA 4m 25s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8826  F1=0.5461  BA=0.4923  MCC=0.6066  [1m 2s | ETA 3m 12s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8853  F1=0.5674  BA=0.5076  MCC=0.6168  [53s | ETA 2m 0s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8800  F1=0.5453  BA=0.4910  MCC=0.5985  [53s | ETA 59s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8813  F1=0.5519  BA=0.4908  MCC=0.5975  [44s | ETA 0s]
+  Total CV time: 4m 38s
+
+============================================================
+  Ablation: ESM-2 + Handcrafted -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8836 +/- 0.0031
+  Macro F1:          0.5581 +/- 0.0135
+  Balanced Accuracy: 0.4991 +/- 0.0096
+  MCC:               0.6092 +/- 0.0112
+============================================================
+
+------------------------------------------------------------------------
+  Training: Ablation: ESM-2 + Physicochemical  |  Folds: 5  |  Features: 1288  |  Samples: 39764
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+------------------------------------------------------------------------
+  [Fold 1/5] train=31,811  val=7,953  Acc=0.8902  F1=0.6009  BA=0.5347  MCC=0.6348  [55s | ETA 3m 40s]
+  [Fold 2/5] train=31,811  val=7,953  Acc=0.8876  F1=0.5653  BA=0.5122  MCC=0.6265  [42s | ETA 2m 25s]
+  [Fold 3/5] train=31,811  val=7,953  Acc=0.8891  F1=0.5977  BA=0.5391  MCC=0.6340  [56s | ETA 1m 42s]
+  [Fold 4/5] train=31,811  val=7,953  Acc=0.8831  F1=0.5532  BA=0.5016  MCC=0.6111  [57s | ETA 53s]
+  [Fold 5/5] train=31,812  val=7,952  Acc=0.8815  F1=0.5627  BA=0.5048  MCC=0.6021  [56s | ETA 0s]
+  Total CV time: 4m 25s
+
+============================================================
+  Ablation: ESM-2 + Physicochemical -- 5-Fold Cross-Validation Results
+============================================================
+  Accuracy:          0.8863 +/- 0.0034
+  Macro F1:          0.5760 +/- 0.0195
+  Balanced Accuracy: 0.5185 +/- 0.0155
+  MCC:               0.6217 +/- 0.0130
+============================================================
+
+========================================================================
+Model                            Accuracy   Macro F1  Bal. Acc.        MCC
+------------------------------------------------------------------------
+Ablation: ESM-2                0.8851+/-0.003 0.5663+/-0.015 0.5129+/-0.011 0.6176+/-0.010
+Ablation: Handcrafted          0.8164+/-0.002 0.2108+/-0.009 0.1944+/-0.006 0.2383+/-0.009
+Ablation: ESM-2 + Handcrafted  0.8836+/-0.003 0.5581+/-0.013 0.4991+/-0.010 0.6092+/-0.011
+Ablation: ESM-2 + Physicochemical 0.8863+/-0.003 0.5760+/-0.020 0.5185+/-0.015 0.6217+/-0.013
+========================================================================
+Metrics comparison saved to /workspace/protein-classification/outputs/figures/ablation_results.png
+
+Best: XGBoost+SMOTE (ESM-2 + Physico)  Macro F1=0.5973
+Retraining best model on full dataset...
+
+  Optimized per-class thresholds: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  Threshold-opt metrics:  Macro F1=0.5976  BA=0.5531  MCC=0.6353
+  Saved -> /workspace/protein-classification/outputs/models/best_model.joblib  [3m 51s]
+
+========================================================================
+Model                            Accuracy   Macro F1  Bal. Acc.        MCC
+------------------------------------------------------------------------
+XGBoost-Tuned (ESM-2 + Physico) 0.8863+/-0.003 0.5760+/-0.020 0.5185+/-0.015 0.6217+/-0.013
+XGBoost (ESM-2 + Physico)      0.8863+/-0.003 0.5760+/-0.020 0.5185+/-0.015 0.6217+/-0.013
+LightGBM (ESM-2 + Physico)     0.8794+/-0.003 0.5152+/-0.013 0.4668+/-0.008 0.6051+/-0.010
+LightGBM+SMOTE (ESM-2 + Physico) 0.8800+/-0.002 0.5763+/-0.014 0.5347+/-0.010 0.6201+/-0.006
+XGBoost+SMOTE (ESM-2 + Physico) 0.8875+/-0.004 0.5973+/-0.020 0.5531+/-0.014 0.6353+/-0.012
+========================================================================
+
+--- Best Model Classification Report ---
+                precision    recall  f1-score   support
+
+    Not enzyme       0.93      0.96      0.95     32410
+Oxidoreductase       0.66      0.63      0.64      1184
+   Transferase       0.66      0.62      0.64      2769
+     Hydrolase       0.65      0.57      0.61      2108
+         Lyase       0.50      0.31      0.38       600
+     Isomerase       0.53      0.22      0.31       411
+        Ligase       0.77      0.56      0.65       282
+
+      accuracy                           0.89     39764
+     macro avg       0.67      0.55      0.60     39764
+  weighted avg       0.88      0.89      0.88     39764
+
+Results saved to /workspace/protein-classification/outputs/advanced_results.json
+
+Total wall time: 2h 4m

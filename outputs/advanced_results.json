@@ -1,61 +1,74 @@
 {
-  "esm_model": "esm2_t6_8M_UR50D",
+  "esm_model": "esm2_t33_650M_UR50D",
   "feature_source": "ESM-2 + Physicochemical",
   "primary_features_shape": [
     39764,
-    328
+    1288
   ],
   "models": [
     {
+      "model_name": "XGBoost-Tuned (ESM-2 + Physico)",
+      "summary": {
+        "accuracy_mean": 0.886228666478944,
+        "accuracy_std": 0.0026512364060245546,
+        "macro_f1_mean": 0.5748304355111735,
+        "macro_f1_std": 0.013120185318340636,
+        "balanced_accuracy_mean": 0.5164843350750462,
+        "balanced_accuracy_std": 0.010577820231194583,
+        "mcc_mean": 0.6208777145403286,
+        "mcc_std": 0.010378099484912851
+      }
+    },
+    {
       "model_name": "XGBoost (ESM-2 + Physico)",
       "summary": {
-        "accuracy_mean": 0.8664118085857024,
-        "accuracy_std": 0.002310986561721842,
-        "macro_f1_mean": 0.53464565742397,
-        "macro_f1_std": 0.018550275518340282,
-        "balanced_accuracy_mean": 0.5144945454199702,
-        "balanced_accuracy_std": 0.017107406433938127,
-        "mcc_mean": 0.5877303876146684,
-        "mcc_std": 0.005499907269738358
+        "accuracy_mean": 0.886228666478944,
+        "accuracy_std": 0.0026512364060245546,
+        "macro_f1_mean": 0.5748304355111735,
+        "macro_f1_std": 0.013120185318340636,
+        "balanced_accuracy_mean": 0.5164843350750462,
+        "balanced_accuracy_std": 0.010577820231194583,
+        "mcc_mean": 0.6208777145403286,
+        "mcc_std": 0.010378099484912851
       }
     },
     {
       "model_name": "LightGBM (ESM-2 + Physico)",
       "summary": {
-        "accuracy_mean": 0.8676692368469588,
-        "accuracy_std": 0.000651346556488093,
-        "macro_f1_mean": 0.5128548796834183,
-        "macro_f1_std": 0.01534819974056799,
-        "balanced_accuracy_mean": 0.47827081868433413,
-        "balanced_accuracy_std": 0.01215799079309957,
-        "mcc_mean": 0.5787540256089632,
-        "mcc_std": 0.0010690012985040158
+        "accuracy_mean": 0.879388319101077,
+        "accuracy_std": 0.0025325933431589276,
+        "macro_f1_mean": 0.5152397802861971,
+        "macro_f1_std": 0.012583648917703083,
+        "balanced_accuracy_mean": 0.4667581006059434,
+        "balanced_accuracy_std": 0.00830592369007837,
+        "mcc_mean": 0.605125528490447,
+        "mcc_std": 0.010082792923101849
       }
     },
     {
       "model_name": "LightGBM+SMOTE (ESM-2 + Physico)",
       "summary": {
-        "accuracy_mean": 0.8542399246478494,
-        "accuracy_std": 0.003990267388021625,
-        "macro_f1_mean": 0.5277318171277239,
-        "macro_f1_std": 0.014069291009104945,
-        "balanced_accuracy_mean": 0.525475361519514,
-        "balanced_accuracy_std": 0.01595418139308252,
-        "mcc_mean": 0.5679934224396208,
-        "mcc_std": 0.010595515826840835
+        "accuracy_mean": 0.8800171233613172,
+        "accuracy_std": 0.001961762887785934,
+        "macro_f1_mean": 0.5762606328868348,
+        "macro_f1_std": 0.013970768844657325,
+        "balanced_accuracy_mean": 0.5346542729803498,
+        "balanced_accuracy_std": 0.010473052873815086,
+        "mcc_mean": 0.6200588990987503,
+        "mcc_std": 0.005694161900503417
       }
     },
     {
       "model_name": "XGBoost+SMOTE (ESM-2 + Physico)",
       "summary": {
-        "accuracy_mean": 0.8495875131336238,
-        "accuracy_std": 0.002838434990308209,
-        "macro_f1_mean": 0.53030285985495,
-        "macro_f1_std": 0.013237561077643987,
-        "balanced_accuracy_mean": 0.5449390878840786,
-        "balanced_accuracy_std": 0.015723496484461478,
-        "mcc_mean": 0.5682448932268296,
-        "mcc_std": 0.0073160762603978425
+        "accuracy_mean": 0.88622877400199,
+        "accuracy_std": 0.0019439144097847898,
+        "macro_f1_mean": 0.5949507550348443,
+        "macro_f1_std": 0.014401515276100485,
+        "balanced_accuracy_mean": 0.5519223377263616,
+        "balanced_accuracy_std": 0.01093382203546937,
+        "mcc_mean": 0.6308422924113162,
+        "mcc_std": 0.006275241003331497
       }
     }
   ],
@@ -63,81 +76,87 @@
     {
       "model_name": "Ablation: ESM-2",
       "summary": {
-        "accuracy_mean": 0.8645256677750396,
-        "accuracy_std": 0.0017296415615421338,
-        "macro_f1_mean": 0.5305999923602084,
-        "macro_f1_std": 0.014439717971511307,
-        "balanced_accuracy_mean": 0.507858718914315,
-        "balanced_accuracy_std": 0.0141784236905693,
-        "mcc_mean": 0.5811637665770362,
-        "mcc_std": 0.004977394383849621
+        "accuracy_mean": 0.8844180258212168,
+        "accuracy_std": 0.0023656337550187374,
+        "macro_f1_mean": 0.562160885942626,
+        "macro_f1_std": 0.012931387364088873,
+        "balanced_accuracy_mean": 0.5062906803439609,
+        "balanced_accuracy_std": 0.008783199481715881,
+        "mcc_mean": 0.614905254479505,
+        "mcc_std": 0.007873329116994293
       }
     },
     {
       "model_name": "Ablation: Handcrafted",
       "summary": {
-        "accuracy_mean": 0.7806557628178223,
-        "accuracy_std": 0.0037839897315552506,
-        "macro_f1_mean": 0.24675047318719812,
-        "macro_f1_std": 0.00662086422762554,
-        "balanced_accuracy_mean": 0.24614877339142502,
-        "balanced_accuracy_std": 0.004541915887099708,
-        "mcc_mean": 0.30427798253518595,
-        "mcc_std": 0.007400385791171163
+        "accuracy_mean": 0.8166180883869798,
+        "accuracy_std": 0.0014118127988736672,
+        "macro_f1_mean": 0.2057091986202711,
+        "macro_f1_std": 0.00410268812555735,
+        "balanced_accuracy_mean": 0.19092894961196222,
+        "balanced_accuracy_std": 0.002694474159240813,
+        "mcc_mean": 0.23579905258710201,
+        "mcc_std": 0.008440641952555531
       }
     },
     {
       "model_name": "Ablation: ESM-2 + Handcrafted",
       "summary": {
-        "accuracy_mean": 0.8645004694329691,
-        "accuracy_std": 0.0021253531352823265,
-        "macro_f1_mean": 0.5020934181214458,
-        "macro_f1_std": 0.017299347007663706,
-        "balanced_accuracy_mean": 0.47278243219326016,
-        "balanced_accuracy_std": 0.014409404740881161,
-        "mcc_mean": 0.5698462060319204,
-        "mcc_std": 0.007708992759335641
+        "accuracy_mean": 0.8835629677726867,
+        "accuracy_std": 0.0022549289908232635,
+        "macro_f1_mean": 0.5523133831805778,
+        "macro_f1_std": 0.011341093307687122,
+        "balanced_accuracy_mean": 0.4962975830795743,
+        "balanced_accuracy_std": 0.007734220282387971,
+        "mcc_mean": 0.6092553985066601,
+        "mcc_std": 0.008257897365016503
       }
     },
     {
       "model_name": "Ablation: ESM-2 + Physicochemical",
       "summary": {
-        "accuracy_mean": 0.8664118085857024,
-        "accuracy_std": 0.002310986561721842,
-        "macro_f1_mean": 0.53464565742397,
-        "macro_f1_std": 0.018550275518340282,
-        "balanced_accuracy_mean": 0.5144945454199702,
-        "balanced_accuracy_std": 0.017107406433938127,
-        "mcc_mean": 0.5877303876146684,
-        "mcc_std": 0.005499907269738358
+        "accuracy_mean": 0.886228666478944,
+        "accuracy_std": 0.0026512364060245546,
+        "macro_f1_mean": 0.5748304355111735,
+        "macro_f1_std": 0.013120185318340636,
+        "balanced_accuracy_mean": 0.5164843350750462,
+        "balanced_accuracy_std": 0.010577820231194583,
+        "mcc_mean": 0.6208777145403286,
+        "mcc_std": 0.010378099484912851
       }
     }
   ],
-  "best_model": "XGBoost (ESM-2 + Physico)",
+  "best_model": "XGBoost+SMOTE (ESM-2 + Physico)",
   "best_cv_scores": {
-    "accuracy_mean": 0.8664118085857024,
-    "accuracy_std": 0.002310986561721842,
-    "macro_f1_mean": 0.53464565742397,
-    "macro_f1_std": 0.018550275518340282,
-    "balanced_accuracy_mean": 0.5144945454199702,
-    "balanced_accuracy_std": 0.017107406433938127,
-    "mcc_mean": 0.5877303876146684,
-    "mcc_std": 0.005499907269738358
+    "accuracy_mean": 0.88622877400199,
+    "accuracy_std": 0.0019439144097847898,
+    "macro_f1_mean": 0.5949507550348443,
+    "macro_f1_std": 0.014401515276100485,
+    "balanced_accuracy_mean": 0.5519223377263616,
+    "balanced_accuracy_std": 0.01093382203546937,
+    "mcc_mean": 0.6308422924113162,
+    "mcc_std": 0.006275241003331497
   },
-  "xgb_params": {},
+  "xgb_params": {
+    "max_depth": 6,
+    "n_estimators": 800,
+    "learning_rate": 0.1,
+    "subsample": 0.8,
+    "colsample_bytree": 0.9
+  },
   "thresholds": [
     1.0,
-    1.0,
-    1.0002500312526044,
-    1.0,
-    1.0,
-    1.0,
-    1.0
+    1.0001581757737747,
+    1.000321480235127,
+    1.000321480235127,
+    1.000321480235127,
+    1.000321480235127,
+    1.000321480235127
   ],
   "threshold_metrics": {
-    "accuracy": 0.8664369781712101,
-    "macro_f1": 0.5358982158743559,
-    "balanced_accuracy": 0.5146149306300758,
-    "mcc": 0.5877670856609218
+    "accuracy": 0.8862538979981893,
+    "macro_f1": 0.5958521349969533,
+    "balanced_accuracy": 0.5518681303724872,
+    "mcc": 0.6308669408746099
   }
 }
