@@ -56,6 +56,13 @@ def extract_features(
     parts = []
     source_lower = feature_source.lower()
 
+    # Fine-tuned model handles raw sequences internally — skip feature extraction
+    if source_lower == "finetune":
+        raise ValueError(
+            "feature_source='finetune' requires raw sequences; "
+            "call FinetunePredictor.predict_proba(sequences) directly."
+        )
+
     needs_handcrafted = "handcrafted" in source_lower
     needs_esm = "esm" in source_lower
     needs_physico = "physicochemical" in source_lower
@@ -112,23 +119,29 @@ def predict_blind(
     if len(sequences) == 0:
         raise ValueError(f"No sequences found in {fasta_path}")
 
-    # Extract features
-    X = extract_features(sequences, feature_source, model_name=esm_model_name)
-    if X.shape[1] != scaler.n_features_in_:
-        raise ValueError(
-            f"Feature dimension mismatch: extracted {X.shape[1]}, "
-            f"model expects {scaler.n_features_in_}"
-        )
-    X = scaler.transform(X)
+    # Fine-tuned ESM-2 model: raw sequences go directly to the model
+    if feature_source.lower() == "finetune":
+        logger.info("Fine-tuned model detected — passing raw sequences directly")
+        y_proba = model.predict_proba(sequences)
+        y_pred = y_proba.argmax(axis=1)
+    else:
+        # Extract features
+        X = extract_features(sequences, feature_source, model_name=esm_model_name)
+        if X.shape[1] != scaler.n_features_in_:
+            raise ValueError(
+                f"Feature dimension mismatch: extracted {X.shape[1]}, "
+                f"model expects {scaler.n_features_in_}"
+            )
+        X = scaler.transform(X)
 
-    # Predict -- suppress sklearn's feature-names warning for LightGBM
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", message=".*feature names.*", category=UserWarning)
-        y_proba = (
-            model.predict_proba(X)
-            if hasattr(model, "predict_proba")
-            else np.zeros((len(X), 7))
-        )
+        # Predict -- suppress sklearn's feature-names warning for LightGBM
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*feature names.*", category=UserWarning)
+            y_proba = (
+                model.predict_proba(X)
+                if hasattr(model, "predict_proba")
+                else np.zeros((len(X), 7))
+            )
         # Apply per-class thresholds if available
         if thresholds is not None:
             adjusted = y_proba / thresholds[np.newaxis, :]
