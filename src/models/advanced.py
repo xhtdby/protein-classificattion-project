@@ -162,7 +162,7 @@ def tune_xgboost(
         candidates = all_combos
 
     print(f"\n{'='*72}")
-    print(f"  HYPERPARAMETER TUNING — {len(candidates)} XGBoost configurations")
+    print(f"  HYPERPARAMETER TUNING -- {len(candidates)} XGBoost configurations")
     print(f"{'='*72}")
 
     best_f1 = -1.0

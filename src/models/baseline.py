@@ -54,7 +54,7 @@ def make_random_forest():
 
 
 def make_random_forest_pca(n_components: int = 50):
-    """RF with PCA pre-reduction — avoids curse of dimensionality on sparse dipeptides."""
+    """RF with PCA pre-reduction -- avoids curse of dimensionality on sparse dipeptides."""
     return Pipeline([
         ("pca", PCA(n_components=n_components, random_state=SEED)),
         ("rf", RandomForestClassifier(

@@ -30,6 +30,8 @@ import time
 import traceback
 from pathlib import Path
 
+import os
+
 import joblib
 import numpy as np
 import torch
@@ -48,20 +50,21 @@ from src.evaluation import plot_confusion_matrix, save_results_json
 
 logger = logging.getLogger(__name__)
 
-# ── Reproducibility ────────────────────────────────────────────────────────────
+# -- Reproducibility ------------------------------------------------------------
 random.seed(SEED)
 np.random.seed(SEED)
 torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
-MAX_LEN = 1022
+MAX_LEN = 512  # 512 vs 1022 cuts attention memory 4x -- fits in 6.4 GB VRAM
 N_CLASSES = 7
 EMB_DIM = 320       # ESM-2 8M output dimension
 ESM_MODEL_NAME = "esm2_t6_8M_UR50D"
 
 
-# ── Dataset ────────────────────────────────────────────────────────────────────
+# -- Dataset --------------------------------------------------------------------
 class ProteinDataset(Dataset):
     def __init__(self, sequences: list[str], labels: list[int], max_len: int = MAX_LEN):
         self.sequences = [s[:max_len] for s in sequences]
@@ -85,7 +88,7 @@ def make_collate_fn(batch_converter):
     return collate
 
 
-# ── Model ──────────────────────────────────────────────────────────────────────
+# -- Model ----------------------------------------------------------------------
 class ESM2Classifier(nn.Module):
     """ESM-2 backbone + classification head."""
 
@@ -113,7 +116,7 @@ class ESM2Classifier(nn.Module):
         return self.classifier(pooled)
 
 
-# ── Sklearn-compatible predictor (for predict_blind.py) ───────────────────────
+# -- Sklearn-compatible predictor (for predict_blind.py) -----------------------
 class FinetunePredictor:
     """Wraps a saved ESM2Classifier state-dict for sklearn-style predict_proba.
 
@@ -156,7 +159,7 @@ class FinetunePredictor:
         return np.vstack(all_proba)
 
 
-# ── Training helpers ───────────────────────────────────────────────────────────
+# -- Training helpers -----------------------------------------------------------
 def _compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     return {
         "accuracy":          float(accuracy_score(y_true, y_pred)),
@@ -171,42 +174,52 @@ def _run_epoch(
     loader: DataLoader,
     criterion: nn.Module,
     optimizer: AdamW,
-    scaler: torch.amp.GradScaler,
+    amp_scaler: torch.amp.GradScaler,
     device: torch.device,
     train: bool = True,
     scheduler=None,
+    grad_accum: int = 1,
 ) -> dict:
     model.train(train)
     total_loss = 0.0
     all_preds: list[np.ndarray] = []
     all_labels: list[np.ndarray] = []
 
-    ctx = torch.set_grad_enabled(train)
     amp_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
     amp_enabled = device.type == "cuda"
+    n_batches = len(loader)
 
-    with ctx:
-        for tokens, labels, seq_lengths in loader:
+    if train:
+        optimizer.zero_grad(set_to_none=True)
+
+    with torch.set_grad_enabled(train):
+        for step, (tokens, labels, seq_lengths) in enumerate(loader):
             tokens = tokens.to(device, non_blocking=True)
             labels = labels.to(device, non_blocking=True)
             seq_lengths = seq_lengths.to(device, non_blocking=True)
+            is_last = (step == n_batches - 1)
 
             with torch.amp.autocast(device_type="cuda", dtype=amp_dtype,
                                     enabled=amp_enabled):
                 logits = model(tokens, seq_lengths)
                 loss = criterion(logits, labels)
+                if train:
+                    loss = loss / grad_accum
 
             if train:
-                optimizer.zero_grad(set_to_none=True)
-                scaler.scale(loss).backward()
-                scaler.unscale_(optimizer)
-                nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
-                scaler.step(optimizer)
-                scaler.update()
-                if scheduler is not None:
-                    scheduler.step()
+                amp_scaler.scale(loss).backward()
+                if (step + 1) % grad_accum == 0 or is_last:
+                    amp_scaler.unscale_(optimizer)
+                    nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+                    amp_scaler.step(optimizer)
+                    amp_scaler.update()
+                    optimizer.zero_grad(set_to_none=True)
+                    if scheduler is not None:
+                        scheduler.step()
 
-            total_loss += loss.item() * len(labels)
+            # Undo the /grad_accum scaling when logging loss
+            logged_loss = loss.item() * (grad_accum if train else 1)
+            total_loss += logged_loss * len(labels)
             all_preds.append(logits.argmax(dim=-1).cpu().numpy())
             all_labels.append(labels.cpu().numpy())
 
@@ -232,17 +245,19 @@ def _collect_oof(model: ESM2Classifier, loader: DataLoader,
     return np.concatenate(all_preds), np.vstack(all_proba)
 
 
-# ── Cross-validation ───────────────────────────────────────────────────────────
+# -- Cross-validation -----------------------------------------------------------
 def cross_validate_finetune(
     sequences: list[str],
     y: np.ndarray,
     cv_splits: list,
     *,
     epochs: int = 10,
-    batch_size: int = 32,
+    batch_size: int = 4,
+    grad_accum: int = 4,
     lr_backbone: float = 2e-5,
     lr_head: float = 1e-4,
     patience: int = 5,
+    max_len: int = MAX_LEN,
     device: torch.device,
     figures_dir: Path,
     checkpoints_dir: Path,
@@ -254,19 +269,20 @@ def cross_validate_finetune(
     oof_proba = np.zeros((len(y), N_CLASSES), dtype=np.float32)
 
     print(f"\n{'='*72}")
-    print(f"  ESM-2 8M FINE-TUNING — {len(cv_splits)}-fold CV")
-    print(f"  epochs={epochs}  batch={batch_size}  "
-          f"lr_backbone={lr_backbone:.0e}  lr_head={lr_head:.0e}")
+    print(f"  ESM-2 8M FINE-TUNING -- {len(cv_splits)}-fold CV")
+    print(f"  epochs={epochs}  batch={batch_size}  grad_accum={grad_accum}  "
+          f"(effective_batch={batch_size*grad_accum})  max_len={max_len}")
+    print(f"  lr_backbone={lr_backbone:.0e}  lr_head={lr_head:.0e}")
     print(f"{'='*72}")
 
     for fold_i, (train_idx, val_idx) in enumerate(cv_splits):
-        print(f"\n{'─'*72}")
+        print(f"\n{'-'*72}")
         print(f"  FOLD {fold_i+1}/{len(cv_splits)}  "
               f"train={len(train_idx):,}  val={len(val_idx):,}")
-        print(f"{'─'*72}")
+        print(f"{'-'*72}")
         t_fold = time.time()
 
-        # Fresh model per fold — no cross-fold contamination
+        # Fresh model per fold -- no cross-fold contamination
         esm_model, alphabet = esm_lib.pretrained.esm2_t6_8M_UR50D()
         model = ESM2Classifier(esm_model).to(device)
         batch_converter = alphabet.get_batch_converter()
@@ -278,12 +294,12 @@ def cross_validate_finetune(
         y_val      = y[val_idx]
 
         train_loader = DataLoader(
-            ProteinDataset(train_seqs, y_train.tolist()),
+            ProteinDataset(train_seqs, y_train.tolist(), max_len=max_len),
             batch_size=batch_size, shuffle=True,
             collate_fn=collate, num_workers=0, pin_memory=True,
         )
         val_loader = DataLoader(
-            ProteinDataset(val_seqs, y_val.tolist()),
+            ProteinDataset(val_seqs, y_val.tolist(), max_len=max_len),
             batch_size=batch_size * 2, shuffle=False,
             collate_fn=collate, num_workers=0, pin_memory=True,
         )
@@ -302,7 +318,9 @@ def cross_validate_finetune(
             ],
             weight_decay=0.01,
         )
-        total_steps = epochs * len(train_loader)
+        # Scheduler steps once per grad-accum update, not per batch
+        accum_steps = (len(train_loader) + grad_accum - 1) // grad_accum
+        total_steps = epochs * accum_steps
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             optimizer,
             max_lr=[lr_backbone, lr_head],
@@ -320,12 +338,13 @@ def cross_validate_finetune(
         for epoch in range(1, epochs + 1):
             t_ep = time.time()
             tr = _run_epoch(model, train_loader, criterion, optimizer,
-                            grad_scaler, device, train=True, scheduler=scheduler)
+                            grad_scaler, device, train=True, scheduler=scheduler,
+                            grad_accum=grad_accum)
             vl = _run_epoch(model, val_loader, criterion, optimizer,
                             grad_scaler, device, train=False)
 
             improved = vl["macro_f1"] > best_val_f1
-            marker   = " ★ NEW BEST" if improved else ""
+            marker   = " * NEW BEST" if improved else ""
             print(
                 f"  Epoch {epoch:>2}/{epochs}  "
                 f"loss={tr['loss']:.4f}/{vl['loss']:.4f}  "
@@ -378,15 +397,17 @@ def cross_validate_finetune(
     }
 
 
-# ── Full-dataset retrain ───────────────────────────────────────────────────────
+# -- Full-dataset retrain -------------------------------------------------------
 def retrain_full(
     sequences: list[str],
     y: np.ndarray,
     *,
     epochs: int,
     batch_size: int,
-    lr_backbone: float,
-    lr_head: float,
+    grad_accum: int = 4,
+    lr_backbone: float = 2e-5,
+    lr_head: float = 1e-4,
+    max_len: int = MAX_LEN,
     device: torch.device,
     save_path: Path,
 ) -> None:
@@ -401,7 +422,7 @@ def retrain_full(
     collate = make_collate_fn(alphabet.get_batch_converter())
 
     loader = DataLoader(
-        ProteinDataset(sequences, y.tolist()),
+        ProteinDataset(sequences, y.tolist(), max_len=max_len),
         batch_size=batch_size, shuffle=True,
         collate_fn=collate, num_workers=0, pin_memory=True,
     )
@@ -416,10 +437,11 @@ def retrain_full(
         ],
         weight_decay=0.01,
     )
+    accum_steps = (len(loader) + grad_accum - 1) // grad_accum
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer,
         max_lr=[lr_backbone, lr_head],
-        total_steps=epochs * len(loader),
+        total_steps=epochs * accum_steps,
         pct_start=0.1,
     )
     grad_scaler = torch.amp.GradScaler(enabled=device.type == "cuda")
@@ -427,7 +449,8 @@ def retrain_full(
     for epoch in range(1, epochs + 1):
         t = time.time()
         m = _run_epoch(model, loader, criterion, optimizer,
-                       grad_scaler, device, train=True, scheduler=scheduler)
+                       grad_scaler, device, train=True, scheduler=scheduler,
+                       grad_accum=grad_accum)
         print(f"  Epoch {epoch:>2}/{epochs}  "
               f"loss={m['loss']:.4f}  F1={m['macro_f1']:.4f}  "
               f"[{fmt_time(time.time()-t)}]", flush=True)
@@ -438,14 +461,16 @@ def retrain_full(
     torch.cuda.empty_cache()
 
 
-# ── Entry point ────────────────────────────────────────────────────────────────
+# -- Entry point ----------------------------------------------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Fine-tune ESM-2 8M for enzyme classification",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument("--epochs",       type=int,   default=10,   help="Max epochs per fold")
-    parser.add_argument("--batch-size",   type=int,   default=32,   help="Training batch size")
+    parser.add_argument("--batch-size",   type=int,   default=4,    help="Per-GPU batch size (use grad-accum for larger effective batch)")
+    parser.add_argument("--grad-accum",   type=int,   default=4,    help="Gradient accumulation steps (effective batch = batch-size x grad-accum)")
+    parser.add_argument("--max-len",      type=int,   default=512,  help="Max sequence length (tokens). 512 fits 6GB VRAM; 1022 needs 24GB+")
     parser.add_argument("--lr-backbone",  type=float, default=2e-5, help="LR for ESM-2 backbone")
     parser.add_argument("--lr-head",      type=float, default=1e-4, help="LR for classifier head")
     parser.add_argument("--patience",     type=int,   default=5,    help="Early stopping patience")
@@ -485,7 +510,7 @@ if __name__ == "__main__":
     figures_dir.mkdir(parents=True, exist_ok=True)
     models_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── Load sequences ────────────────────────────────────────────────────────
+    # -- Load sequences --------------------------------------------------------
     t0 = time.time()
     print("\nLoading sequences...")
     df = load_all_sequences(project_root)
@@ -495,15 +520,17 @@ if __name__ == "__main__":
     print(f"  Loaded {len(df):,} sequences  [{fmt_time(time.time()-t0)}]")
     print(f"  Class distribution: {np.bincount(y).tolist()}")
 
-    # ── Cross-validation ──────────────────────────────────────────────────────
+    # -- Cross-validation ------------------------------------------------------
     t_cv = time.time()
     cv_result = cross_validate_finetune(
         sequences, y, cv_splits,
         epochs=args.epochs,
         batch_size=args.batch_size,
+        grad_accum=args.grad_accum,
         lr_backbone=args.lr_backbone,
         lr_head=args.lr_head,
         patience=args.patience,
+        max_len=args.max_len,
         device=device,
         figures_dir=figures_dir,
         checkpoints_dir=models_dir,
@@ -534,7 +561,7 @@ if __name__ == "__main__":
         title="ESM-2 8M Fine-tuned -- OOF Confusion Matrix",
     )
 
-    # ── Save CV results JSON ──────────────────────────────────────────────────
+    # -- Save CV results JSON --------------------------------------------------
     results_path = project_root / "outputs" / "finetune_results.json"
     results_data = dict(cv_result)
     results_data["config"] = {
@@ -545,24 +572,26 @@ if __name__ == "__main__":
     save_results_json(results_data, results_path)
     print(f"\nResults saved -> {results_path}")
 
-    # ── Final retrain on full dataset ─────────────────────────────────────────
+    # -- Final retrain on full dataset -----------------------------------------
     retrain_ep = args.retrain_epochs if args.retrain_epochs else args.epochs
     final_model_path = models_dir / "finetune_final.pt"
     retrain_full(
         sequences, y,
         epochs=retrain_ep,
         batch_size=args.batch_size,
+        grad_accum=args.grad_accum,
         lr_backbone=args.lr_backbone,
         lr_head=args.lr_head,
+        max_len=args.max_len,
         device=device,
         save_path=final_model_path,
     )
 
-    # ── Save joblib artifact for predict_blind.py ─────────────────────────────
+    # -- Save joblib artifact for predict_blind.py -----------------------------
     predictor = FinetunePredictor(final_model_path)
     artifact = {
         "model":           predictor,
-        "scaler":          None,          # No external scaler — model handles raw sequences
+        "scaler":          None,          # No external scaler -- model handles raw sequences
         "feature_source":  "finetune",
         "esm_model_name":  ESM_MODEL_NAME,
         "esm_embedding_dim": EMB_DIM,

@@ -59,7 +59,7 @@ def _load_all_results(outputs_dir: Path) -> tuple[list[dict], list[dict]]:
         print(f"  Loaded {len(adv['models'])} advanced + {len(ablation)} ablation results from JSON")
 
     if not all_models:
-        print("  WARNING: No JSON results found — run baseline.py and advanced.py first")
+        print("  WARNING: No JSON results found -- run baseline.py and advanced.py first")
 
     return all_models, ablation
 
@@ -89,7 +89,7 @@ def plot_model_comparison(results: list[dict], save_path: Path) -> None:
     ax.set_xticklabels(metric_labels, fontsize=12)
     ax.set_ylim(-0.05, 1.05)
     ax.set_ylabel("Score", fontsize=12)
-    ax.set_title("Model Comparison — 5-Fold Cross-Validation", fontsize=14, fontweight="bold")
+    ax.set_title("Model Comparison -- 5-Fold Cross-Validation", fontsize=14, fontweight="bold")
     ax.legend(loc="upper left", fontsize=9, ncol=2)
     ax.axhline(y=0, color="grey", linewidth=0.5)
     ax.grid(axis="y", alpha=0.3)
@@ -126,7 +126,7 @@ def plot_ablation_study(results: list[dict], save_path: Path) -> None:
     ax.set_xticklabels(metric_labels, fontsize=12)
     ax.set_ylim(-0.05, 1.05)
     ax.set_ylabel("Score", fontsize=12)
-    ax.set_title("Feature Ablation Study — XGBoost 5-Fold CV", fontsize=14, fontweight="bold")
+    ax.set_title("Feature Ablation Study -- XGBoost 5-Fold CV", fontsize=14, fontweight="bold")
     ax.legend(fontsize=10)
     ax.axhline(y=0, color="grey", linewidth=0.5)
     ax.grid(axis="y", alpha=0.3)

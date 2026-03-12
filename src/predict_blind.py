@@ -56,7 +56,7 @@ def extract_features(
     parts = []
     source_lower = feature_source.lower()
 
-    # Fine-tuned model handles raw sequences internally — skip feature extraction
+    # Fine-tuned model handles raw sequences internally -- skip feature extraction
     if source_lower == "finetune":
         raise ValueError(
             "feature_source='finetune' requires raw sequences; "
@@ -121,7 +121,7 @@ def predict_blind(
 
     # Fine-tuned ESM-2 model: raw sequences go directly to the model
     if feature_source.lower() == "finetune":
-        logger.info("Fine-tuned model detected — passing raw sequences directly")
+        logger.info("Fine-tuned model detected -- passing raw sequences directly")
         y_proba = model.predict_proba(sequences)
         y_pred = y_proba.argmax(axis=1)
     else:
