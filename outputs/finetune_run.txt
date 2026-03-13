@@ -1,0 +1,149 @@
+
+========================================================================
+  HARDWARE
+========================================================================
+  Device : cuda
+  GPU    : NVIDIA GeForce RTX 5090
+  VRAM   : 33.7 GB  (33.1 GB free)
+========================================================================
+
+Loading sequences...
+  Loaded 39,764 sequences  [0s]
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+
+========================================================================
+  ESM-2 8M FINE-TUNING -- 5-fold CV
+  epochs=10  batch=16  grad_accum=2  (effective_batch=32)  max_len=1022
+  lr_backbone=2e-05  lr_head=1e-04
+========================================================================
+
+------------------------------------------------------------------------
+  FOLD 1/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+Downloading: "https://dl.fbaipublicfiles.com/fair-esm/models/esm2_t6_8M_UR50D.pt" to /root/.cache/torch/hub/checkpoints/esm2_t6_8M_UR50D.pt
+Downloading: "https://dl.fbaipublicfiles.com/fair-esm/regression/esm2_t6_8M_UR50D-contact-regression.pt" to /root/.cache/torch/hub/checkpoints/esm2_t6_8M_UR50D-contact-regression.pt
+  Epoch  1/10  loss=1.7585/0.8766  F1=0.3545  BA=0.3940  [5m 25s] * NEW BEST
+  Epoch  2/10  loss=1.3118/0.7341  F1=0.4517  BA=0.5077  [5m 27s] * NEW BEST
+  Epoch  3/10  loss=1.1048/0.9517  F1=0.4249  BA=0.5791  [5m 25s]
+  Epoch  4/10  loss=0.9693/0.6807  F1=0.4876  BA=0.5732  [5m 25s] * NEW BEST
+  Epoch  5/10  loss=0.8330/0.6457  F1=0.4806  BA=0.5750  [5m 25s]
+  Epoch  6/10  loss=0.7249/0.7677  F1=0.4509  BA=0.5890  [5m 26s]
+  Epoch  7/10  loss=0.6015/0.5935  F1=0.5039  BA=0.5609  [5m 27s] * NEW BEST
+  Epoch  8/10  loss=0.5147/0.6314  F1=0.4900  BA=0.5646  [5m 26s]
+  Epoch  9/10  loss=0.4649/0.6359  F1=0.4895  BA=0.5546  [5m 26s]
+  Epoch 10/10  loss=0.4293/0.6293  F1=0.4948  BA=0.5570  [5m 27s]
+
+  Fold 1 done  F1=0.5314  BA=0.5772  MCC=0.5611  [57m 4s]
+
+------------------------------------------------------------------------
+  FOLD 2/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  Epoch  1/10  loss=1.7861/1.0128  F1=0.2465  BA=0.3112  [5m 23s] * NEW BEST
+  Epoch  2/10  loss=1.4169/0.8518  F1=0.4198  BA=0.5241  [5m 24s] * NEW BEST
+  Epoch  3/10  loss=1.1526/0.6074  F1=0.4790  BA=0.5182  [5m 26s] * NEW BEST
+  Epoch  4/10  loss=1.0002/0.7305  F1=0.4404  BA=0.5583  [5m 25s]
+  Epoch  5/10  loss=0.8734/0.6069  F1=0.4864  BA=0.5497  [5m 24s] * NEW BEST
+  Epoch  6/10  loss=0.7459/0.6248  F1=0.4787  BA=0.5492  [5m 26s]
+  Epoch  7/10  loss=0.6295/0.6257  F1=0.4774  BA=0.5513  [5m 25s]
+  Epoch  8/10  loss=0.5381/0.6187  F1=0.4827  BA=0.5395  [5m 25s]
+  Epoch  9/10  loss=0.4795/0.6334  F1=0.4776  BA=0.5403  [5m 25s]
+  Epoch 10/10  loss=0.4627/0.6405  F1=0.4759  BA=0.5424  [5m 26s]
+  Early stop (patience=5 epochs without improvement)
+
+  Fold 2 done  F1=0.5079  BA=0.5666  MCC=0.5454  [56m 48s]
+
+------------------------------------------------------------------------
+  FOLD 3/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  Epoch  1/10  loss=1.7711/0.8083  F1=0.3570  BA=0.3599  [5m 26s] * NEW BEST
+  Epoch  2/10  loss=1.3210/0.8943  F1=0.4193  BA=0.5017  [5m 26s] * NEW BEST
+  Epoch  3/10  loss=1.0973/0.7966  F1=0.4625  BA=0.5475  [5m 28s] * NEW BEST
+  Epoch  4/10  loss=0.9482/0.6900  F1=0.4704  BA=0.5970  [5m 27s] * NEW BEST
+  Epoch  5/10  loss=0.8261/0.7319  F1=0.4751  BA=0.5870  [5m 26s] * NEW BEST
+  Epoch  6/10  loss=0.6998/0.6920  F1=0.4813  BA=0.5795  [5m 26s] * NEW BEST
+  Epoch  7/10  loss=0.5799/0.6300  F1=0.4850  BA=0.5664  [5m 26s] * NEW BEST
+  Epoch  8/10  loss=0.4840/0.6138  F1=0.4918  BA=0.5633  [5m 26s] * NEW BEST
+  Epoch  9/10  loss=0.4298/0.6415  F1=0.4889  BA=0.5618  [5m 27s]
+  Epoch 10/10  loss=0.4057/0.6350  F1=0.4895  BA=0.5598  [5m 26s]
+
+  Fold 3 done  F1=0.5155  BA=0.5766  MCC=0.5547  [59m 35s]
+
+------------------------------------------------------------------------
+  FOLD 4/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  Epoch  1/10  loss=1.7756/0.9909  F1=0.3048  BA=0.3808  [5m 29s] * NEW BEST
+  Epoch  2/10  loss=1.3530/0.9023  F1=0.4137  BA=0.5045  [5m 28s] * NEW BEST
+  Epoch  3/10  loss=1.1047/0.7242  F1=0.4435  BA=0.5327  [5m 25s] * NEW BEST
+  Epoch  4/10  loss=0.9519/0.7023  F1=0.4520  BA=0.5693  [5m 28s] * NEW BEST
+  Epoch  5/10  loss=0.8368/0.7001  F1=0.4586  BA=0.5583  [5m 27s] * NEW BEST
+  Epoch  6/10  loss=0.7014/0.6929  F1=0.4687  BA=0.5554  [5m 26s] * NEW BEST
+  Epoch  7/10  loss=0.5883/0.5980  F1=0.4956  BA=0.5553  [5m 25s] * NEW BEST
+  Epoch  8/10  loss=0.4945/0.6128  F1=0.4938  BA=0.5552  [5m 27s]
+  Epoch  9/10  loss=0.4333/0.6123  F1=0.4905  BA=0.5513  [5m 27s]
+  Epoch 10/10  loss=0.3932/0.6212  F1=0.4897  BA=0.5550  [5m 26s]
+
+  Fold 4 done  F1=0.4927  BA=0.5438  MCC=0.5597  [59m 4s]
+
+------------------------------------------------------------------------
+  FOLD 5/5  train=31,812  val=7,952
+------------------------------------------------------------------------
+  Epoch  1/10  loss=1.7513/0.9921  F1=0.2663  BA=0.3418  [5m 25s] * NEW BEST
+  Epoch  2/10  loss=1.3416/0.7314  F1=0.4443  BA=0.5443  [5m 26s] * NEW BEST
+  Epoch  3/10  loss=1.1126/0.6844  F1=0.4729  BA=0.5728  [5m 25s] * NEW BEST
+  Epoch  4/10  loss=0.9641/0.6877  F1=0.4713  BA=0.5666  [5m 25s]
+  Epoch  5/10  loss=0.8377/0.6764  F1=0.4669  BA=0.5803  [5m 27s]
+  Epoch  6/10  loss=0.7081/0.6343  F1=0.4711  BA=0.5334  [5m 25s]
+  Epoch  7/10  loss=0.6032/0.6455  F1=0.4716  BA=0.5532  [5m 25s]
+  Epoch  8/10  loss=0.5031/0.6358  F1=0.4728  BA=0.5416  [5m 25s]
+  Early stop (patience=5 epochs without improvement)
+
+  Fold 5 done  F1=0.4990  BA=0.5868  MCC=0.5424  [45m 22s]
+
+========================================================================
+  ESM-2 8M Fine-tune -- 5-Fold CV Summary
+========================================================================
+  Accuracy:          0.8228 +/- 0.0084
+  Macro F1:          0.5093 +/- 0.0135
+  Balanced Accuracy: 0.5702 +/- 0.0147
+  MCC:               0.5527 +/- 0.0075
+========================================================================
+  Total CV time: 4h 37m
+
+--- OOF Classification Report ---
+                precision    recall  f1-score   support
+
+    Not enzyme       0.96      0.87      0.91     32410
+Oxidoreductase       0.51      0.67      0.58      1184
+   Transferase       0.53      0.70      0.61      2769
+     Hydrolase       0.41      0.65      0.50      2108
+         Lyase       0.18      0.37      0.24       600
+     Isomerase       0.25      0.24      0.24       411
+        Ligase       0.46      0.49      0.47       282
+
+      accuracy                           0.82     39764
+     macro avg       0.47      0.57      0.51     39764
+  weighted avg       0.86      0.82      0.84     39764
+
+Confusion matrix saved to /workspace/protein-classificattion-project/outputs/figures/cm_finetune.png
+Results saved to /workspace/protein-classificattion-project/outputs/finetune_results.json
+
+Results saved -> /workspace/protein-classificattion-project/outputs/finetune_results.json
+
+========================================================================
+  FINAL RETRAIN on full dataset  (39,764 sequences, 10 epochs)
+========================================================================
+  Epoch  1/10  loss=1.7438  F1=0.2352  [5m 57s]
+  Epoch  2/10  loss=1.2677  F1=0.4130  [5m 56s]
+  Epoch  3/10  loss=1.0525  F1=0.4829  [5m 55s]
+  Epoch  4/10  loss=0.9346  F1=0.5195  [5m 58s]
+  Epoch  5/10  loss=0.8314  F1=0.5659  [5m 56s]
+  Epoch  6/10  loss=0.7062  F1=0.6105  [5m 56s]
+  Epoch  7/10  loss=0.5923  F1=0.6632  [5m 57s]
+  Epoch  8/10  loss=0.4919  F1=0.7094  [5m 56s]
+  Epoch  9/10  loss=0.4365  F1=0.7377  [5m 57s]
+  Epoch 10/10  loss=0.4109  F1=0.7482  [5m 56s]
+
+  Saved -> /workspace/protein-classificattion-project/outputs/models/finetune_final.pt
+Joblib artifact saved -> /workspace/protein-classificattion-project/outputs/models/finetune_artifact.joblib
+
+Total wall time: 5h 37m
