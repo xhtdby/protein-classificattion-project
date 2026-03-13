@@ -1,0 +1,10 @@
+cross_validate_model(
+    model_fn,          # callable returning a fresh model instance
+    X, y,              # features and labels
+    cv_splits=None,    # pre-computed fold indices (or generated internally)
+    n_splits=5,
+    use_scaler=True,   # fit StandardScaler on train fold only
+    use_smote=False,   # apply SMOTE on train fold only
+    use_class_weight=False,
+    model_name="model"
+) -> dict

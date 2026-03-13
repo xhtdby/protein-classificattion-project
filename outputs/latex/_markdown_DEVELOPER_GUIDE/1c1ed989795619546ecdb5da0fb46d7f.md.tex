@@ -1,0 +1,699 @@
+\markdownRendererDocumentBegin
+\markdownRendererSectionBegin
+\markdownRendererHeadingOne{Developer Guide — Protein Enzyme Classification Project}\markdownRendererInterblockSeparator
+{}\markdownRendererBlockQuoteBegin
+\markdownRendererStrongEmphasis{Audience:} New developers joining or extending this project.\markdownRendererSoftLineBreak
+{}\markdownRendererStrongEmphasis{Last updated:} March 2026\markdownRendererBlockQuoteEnd \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingTwo{Table of Contents}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}\markdownRendererLink{Project Overview}{\markdownRendererHash{}1-project-overview}{#1-project-overview}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}\markdownRendererLink{Environment Setup}{\markdownRendererHash{}2-environment-setup}{#2-environment-setup}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}\markdownRendererLink{Dataset Description}{\markdownRendererHash{}3-dataset-description}{#3-dataset-description}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}\markdownRendererLink{Architecture Overview}{\markdownRendererHash{}4-architecture-overview}{#4-architecture-overview}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{5}\markdownRendererLink{Module Reference}{\markdownRendererHash{}5-module-reference}{#5-module-reference}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{6}\markdownRendererLink{Data Pipeline}{\markdownRendererHash{}6-data-pipeline}{#6-data-pipeline}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{7}\markdownRendererLink{Feature Engineering}{\markdownRendererHash{}7-feature-engineering}{#7-feature-engineering}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{8}\markdownRendererLink{Model Training}{\markdownRendererHash{}8-model-training}{#8-model-training}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{9}\markdownRendererLink{Evaluation Framework}{\markdownRendererHash{}9-evaluation-framework}{#9-evaluation-framework}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{10}\markdownRendererLink{Interpretability}{\markdownRendererHash{}10-interpretability}{#10-interpretability}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{11}\markdownRendererLink{Confidence Scoring}{\markdownRendererHash{}11-confidence-scoring}{#11-confidence-scoring}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{12}\markdownRendererLink{Blind Prediction Pipeline}{\markdownRendererHash{}12-blind-prediction-pipeline}{#12-blind-prediction-pipeline}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{13}\markdownRendererLink{Results Summary}{\markdownRendererHash{}13-results-summary}{#13-results-summary}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{14}\markdownRendererLink{Data-Leakage Prevention}{\markdownRendererHash{}14-data-leakage-prevention}{#14-data-leakage-prevention}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{15}\markdownRendererLink{Reproducibility}{\markdownRendererHash{}15-reproducibility}{#15-reproducibility}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{16}\markdownRendererLink{Extension Guide}{\markdownRendererHash{}16-extension-guide}{#16-extension-guide}{}\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{17}\markdownRendererLink{Troubleshooting}{\markdownRendererHash{}17-troubleshooting}{#17-troubleshooting}{}\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{1. Project Overview}\markdownRendererInterblockSeparator
+{}This project implements a \markdownRendererStrongEmphasis{7-class supervised classification} system that predicts whether a\markdownRendererSoftLineBreak
+{}protein is an enzyme and, if so, its top-level Enzyme Commission (EC) class. The classes are:\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Class \markdownRendererPipe{} Label \markdownRendererPipe{} Count \markdownRendererPipe{} Proportion \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}-------\markdownRendererPipe{}-------\markdownRendererPipe{}------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 0 \markdownRendererPipe{} Not an enzyme \markdownRendererPipe{} 32 410 \markdownRendererPipe{} 81.5 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 1 \markdownRendererPipe{} Oxidoreductase \markdownRendererPipe{} 1 184 \markdownRendererPipe{} 3.0 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 2 \markdownRendererPipe{} Transferase \markdownRendererPipe{} 2 769 \markdownRendererPipe{} 7.0 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 3 \markdownRendererPipe{} Hydrolase \markdownRendererPipe{} 2 108 \markdownRendererPipe{} 5.3 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 4 \markdownRendererPipe{} Lyase \markdownRendererPipe{} 600 \markdownRendererPipe{} 1.5 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 5 \markdownRendererPipe{} Isomerase \markdownRendererPipe{} 411 \markdownRendererPipe{} 1.0 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} 6 \markdownRendererPipe{} Ligase \markdownRendererPipe{} 282 \markdownRendererPipe{} 0.7 \markdownRendererPercentSign{} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{Total} \markdownRendererPipe{} \markdownRendererPipe{} \markdownRendererStrongEmphasis{39 764} \markdownRendererPipe{} \markdownRendererStrongEmphasis{100 \markdownRendererPercentSign{}} \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}The dataset is \markdownRendererStrongEmphasis{heavily class-imbalanced} (class 0 ≈ 82 \markdownRendererPercentSign{}). Every design decision —\markdownRendererSoftLineBreak
+{}loss weighting, oversampling, metric selection — accounts for this.\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Technology Stack}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Language:} Python 3.10+\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{ML frameworks:} scikit-learn, XGBoost, LightGBM, PyTorch\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Protein language model:} ESM-2 (Meta AI) via the \markdownRendererCodeSpan{fair-esm} library\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Bioinformatics:} BioPython (\markdownRendererCodeSpan{Bio.SeqIO}, \markdownRendererCodeSpan{Bio.SeqUtils.ProtParam})\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Visualisation:} matplotlib, seaborn\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Interpretability:} SHAP\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{2. Environment Setup}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Prerequisites}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem Python ≥ 3.10\markdownRendererUlItemEnd 
+\markdownRendererUlItem CUDA-capable GPU (recommended for ESM-2 extraction and fine-tuning)\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererTilde{}12 GB disk space for embeddings and model checkpoints\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Installation}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/dd14eefae10760338de6e67d17d43c80.verbatim}{bash}{bash}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{requirements.txt}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/0a3ea9bab918d31f71b54b945e3bf32f.verbatim}{}{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Hardware Recommendations}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Task \markdownRendererPipe{} Minimum \markdownRendererPipe{} Recommended \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}------\markdownRendererPipe{}---------\markdownRendererPipe{}-------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Handcrafted features + baselines \markdownRendererPipe{} CPU only \markdownRendererPipe{} Any modern CPU \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} ESM-2 8M embedding extraction \markdownRendererPipe{} 4 GB VRAM \markdownRendererPipe{} 8 GB VRAM \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} ESM-2 650M embedding extraction \markdownRendererPipe{} 8 GB VRAM \markdownRendererPipe{} 16 GB VRAM \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Fine-tuning ESM-2 8M \markdownRendererPipe{} 6 GB VRAM \markdownRendererPipe{} 12 GB VRAM \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{3. Dataset Description}\markdownRendererInterblockSeparator
+{}Seven FASTA files in the workspace root:\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} File \markdownRendererPipe{} Class \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}------\markdownRendererPipe{}-------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{class0\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 0 (Not an enzyme) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ec1\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 1 (Oxidoreductase) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ec2\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 2 (Transferase) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ec3\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 3 (Hydrolase) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ec4\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 4 (Lyase) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ec5\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 5 (Isomerase) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ec6\markdownRendererUnderscore{}rep\markdownRendererUnderscore{}seq.fasta.txt} \markdownRendererPipe{} 6 (Ligase) \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}Each file contains \markdownRendererStrongEmphasis{representative sequences} — non-homologous after clustering, so no\markdownRendererSoftLineBreak
+{}additional deduplication is necessary.\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Sequence Statistics}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Total sequences:} 39 764\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Median length:} \markdownRendererTilde{}300 amino acids\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Max length:} > 1 000 amino acids (a few sequences exceed ESM-2's 1 022-token limit)\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Alphabet:} Standard 20 canonical amino acids plus occasional non-standard residues (X, U, B, Z, O) which are handled gracefully by all feature extractors.\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{4. Architecture Overview}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/939d22f642a8172262f24f6b5e6b16f8.verbatim}{}{}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Execution Order}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/e1d85454ba1d1d4eb3a5b5c8e5f1ee6b.verbatim}{}{}\markdownRendererInterblockSeparator
+{}Phases 2 and 3 are independent and can run in parallel. All other phases are sequential.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{5. Module Reference}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/data\markdownRendererUnderscore{}loading.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Parse all 7 FASTA files and generate stratified cross-validation splits.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Function \markdownRendererPipe{} Signature \markdownRendererPipe{} Description \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}----------\markdownRendererPipe{}-----------\markdownRendererPipe{}-------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{load\markdownRendererUnderscore{}all\markdownRendererUnderscore{}sequences} \markdownRendererPipe{} \markdownRendererCodeSpan{(root: Path) → pd.DataFrame} \markdownRendererPipe{} Returns DataFrame with columns \markdownRendererCodeSpan{seq\markdownRendererUnderscore{}id}, \markdownRendererCodeSpan{sequence}, \markdownRendererCodeSpan{label}, \markdownRendererCodeSpan{length} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{get\markdownRendererUnderscore{}cv\markdownRendererUnderscore{}splits} \markdownRendererPipe{} \markdownRendererCodeSpan{(labels, n\markdownRendererUnderscore{}splits=5, seed=42) → list[tuple]} \markdownRendererPipe{} Stratified K-fold train/val index pairs \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{print\markdownRendererUnderscore{}class\markdownRendererUnderscore{}distribution} \markdownRendererPipe{} \markdownRendererCodeSpan{(df) → None} \markdownRendererPipe{} Formatted class count table \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Key constants:}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererCodeSpan{SEED = 42}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{FASTA\markdownRendererUnderscore{}LABEL\markdownRendererUnderscore{}MAP} — maps each filename to its integer label\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{CLASS\markdownRendererUnderscore{}NAMES} — \markdownRendererCodeSpan{["Not enzyme", "Oxidoreductase", "Transferase", "Hydrolase", "Lyase", "Isomerase", "Ligase"]}\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/features/composition.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Amino acid composition and dipeptide frequency features.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Function \markdownRendererPipe{} Output Shape \markdownRendererPipe{} Description \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}----------\markdownRendererPipe{}-------------\markdownRendererPipe{}-------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{amino\markdownRendererUnderscore{}acid\markdownRendererUnderscore{}composition(seq)} \markdownRendererPipe{} \markdownRendererCodeSpan{(20,)} \markdownRendererPipe{} Normalised frequency of each canonical AA \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{dipeptide\markdownRendererUnderscore{}frequencies(seq)} \markdownRendererPipe{} \markdownRendererCodeSpan{(400,)} \markdownRendererPipe{} Normalised frequency of each AA pair \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{extract\markdownRendererUnderscore{}composition\markdownRendererUnderscore{}features(sequences)} \markdownRendererPipe{} \markdownRendererCodeSpan{(N, 421)} \markdownRendererPipe{} AA (20) + dipeptide (400) + length (1) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{get\markdownRendererUnderscore{}feature\markdownRendererUnderscore{}names()} \markdownRendererPipe{} \markdownRendererCodeSpan{list[str]} \markdownRendererPipe{} Ordered feature names for the 421-d vector \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/features/physicochemical.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Physicochemical property features using \markdownRendererCodeSpan{Bio.SeqUtils.ProtParam}.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Feature \markdownRendererPipe{} Method \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}---------\markdownRendererPipe{}--------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Molecular weight \markdownRendererPipe{} \markdownRendererCodeSpan{ProtParam.molecular\markdownRendererUnderscore{}weight()} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Isoelectric point (pI) \markdownRendererPipe{} \markdownRendererCodeSpan{ProtParam.isoelectric\markdownRendererUnderscore{}point()} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Aromaticity \markdownRendererPipe{} Fraction of F + W + Y \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} GRAVY \markdownRendererPipe{} Grand average of hydropathicity (Kyte–Doolittle) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Charge at pH 7 \markdownRendererPipe{} \markdownRendererCodeSpan{ProtParam.charge\markdownRendererUnderscore{}at\markdownRendererUnderscore{}pH(7.0)} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Helix / Turn / Sheet fractions \markdownRendererPipe{} Chou–Fasman secondary structure propensity \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}Output: \markdownRendererCodeSpan{(N, 8)} array. Feature names available via \markdownRendererCodeSpan{get\markdownRendererUnderscore{}feature\markdownRendererUnderscore{}names()}.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/features/embeddings.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Extract mean-pooled embeddings from ESM-2 protein language models.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Model \markdownRendererPipe{} Parameter Count \markdownRendererPipe{} Embedding Dim \markdownRendererPipe{} Recommended Batch Size \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}----------------\markdownRendererPipe{}---------------\markdownRendererPipe{}----------------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{esm2\markdownRendererUnderscore{}t6\markdownRendererUnderscore{}8M\markdownRendererUnderscore{}UR50D} \markdownRendererPipe{} 8 M \markdownRendererPipe{} 320 \markdownRendererPipe{} 64 (GPU) / 8 (CPU) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{esm2\markdownRendererUnderscore{}t33\markdownRendererUnderscore{}650M\markdownRendererUnderscore{}UR50D} \markdownRendererPipe{} 650 M \markdownRendererPipe{} 1 280 \markdownRendererPipe{} 8 (GPU) / 1 (CPU) \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Key functions:}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererCodeSpan{extract\markdownRendererUnderscore{}esm2\markdownRendererUnderscore{}embeddings(sequences, model\markdownRendererUnderscore{}name, batch\markdownRendererUnderscore{}size, device)} — raw extraction\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{load\markdownRendererUnderscore{}or\markdownRendererUnderscore{}compute\markdownRendererUnderscore{}embeddings(sequences, cache\markdownRendererUnderscore{}path, model\markdownRendererUnderscore{}name)} — with disk caching\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Behaviour:}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Sequences longer than 1 022 tokens are truncated with a warning.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}BOS/EOS tokens are excluded from mean-pooling.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Device fallback: CUDA → MPS → CPU.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}Embeddings are cached as \markdownRendererCodeSpan{.npy} files in \markdownRendererCodeSpan{outputs/features/}.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/training.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Cross-validation loop with strict data-leakage prevention.\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/f934eb581e4045c6e1a618a60accdc63.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Returns:}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/b35e5d7093a66c336d1028abb7305419.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Also provides:}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererCodeSpan{optimize\markdownRendererUnderscore{}thresholds(y\markdownRendererUnderscore{}true, y\markdownRendererUnderscore{}proba)} — per-class threshold tuning via \markdownRendererCodeSpan{scipy.optimize.minimize}\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/models/baseline.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Establish performance floor with simple classifiers on handcrafted features.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Model \markdownRendererPipe{} Configuration \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}---------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Logistic Regression \markdownRendererPipe{} \markdownRendererCodeSpan{class\markdownRendererUnderscore{}weight='balanced'}, \markdownRendererCodeSpan{max\markdownRendererUnderscore{}iter=1000}, \markdownRendererCodeSpan{solver='lbfgs'} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Random Forest \markdownRendererPipe{} \markdownRendererCodeSpan{n\markdownRendererUnderscore{}estimators=300}, \markdownRendererCodeSpan{max\markdownRendererUnderscore{}depth=20}, \markdownRendererCodeSpan{class\markdownRendererUnderscore{}weight='balanced'} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Random Forest + PCA(50) \markdownRendererPipe{} Pipeline: \markdownRendererCodeSpan{PCA(50) → RandomForest} \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}All models are evaluated via the leak-safe \markdownRendererCodeSpan{cross\markdownRendererUnderscore{}validate\markdownRendererUnderscore{}model} loop.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/models/advanced.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Train gradient-boosted models on ESM-2 embeddings with ablation study.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Models trained:}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}XGBoost (ESM-2 650M + Physicochemical)\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}XGBoost with SMOTE\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}LightGBM\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}LightGBM with SMOTE\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{5}Tuned XGBoost (optional random search)\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Ablation study} evaluates four feature combinations:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem Handcrafted only (429-d)\markdownRendererUlItemEnd 
+\markdownRendererUlItem ESM-2 only (1 280-d)\markdownRendererUlItemEnd 
+\markdownRendererUlItem ESM-2 + all Handcrafted (1 709-d)\markdownRendererUlItemEnd 
+\markdownRendererUlItem ESM-2 + Physicochemical (1 288-d) ← winner\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Output artefact:} \markdownRendererCodeSpan{outputs/models/best\markdownRendererUnderscore{}model.joblib} containing:\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/c9237e34b7ea284dda418264caf9a29d.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/models/finetune.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} End-to-end fine-tuning of ESM-2 8M for 7-class classification.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Architecture:}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/ac89b4f2a29e0df604020095bd2ad48a.verbatim}{}{}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Training details:}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem AdamW optimiser with differential learning rates: backbone = 2 × 10⁻⁵, head = 1 × 10⁻⁴\markdownRendererUlItemEnd 
+\markdownRendererUlItem OneCycleLR scheduler\markdownRendererUlItemEnd 
+\markdownRendererUlItem bfloat16 mixed precision (if supported)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Per-fold class weights in the cross-entropy loss\markdownRendererUlItemEnd 
+\markdownRendererUlItem Early stopping on validation Macro F1 (patience = 5)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Gradient accumulation (effective batch size = \markdownRendererCodeSpan{batch\markdownRendererUnderscore{}size × grad\markdownRendererUnderscore{}accum})\markdownRendererUlItemEnd 
+\markdownRendererUlItem Max sequence length = 512 (trades accuracy for VRAM)\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Output artefact:} \markdownRendererCodeSpan{outputs/models/finetune\markdownRendererUnderscore{}artifact.joblib} containing a \markdownRendererCodeSpan{FinetunePredictor}\markdownRendererSoftLineBreak
+{}instance that wraps the PyTorch model for sklearn-style \markdownRendererCodeSpan{predict\markdownRendererUnderscore{}proba}.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/models/ensemble.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Soft-vote ensemble combining fine-tuned ESM-2 8M and XGBoost on frozen 650M\markdownRendererSoftLineBreak
+{}embeddings.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{How it works:}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Collect out-of-fold (OOF) probability vectors from both models.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Compute ensemble weights proportional to each model's OOF Macro F1.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Blend: \markdownRendererCodeSpan{p\markdownRendererUnderscore{}ensemble = w\markdownRendererUnderscore{}ft × p\markdownRendererUnderscore{}finetune + w\markdownRendererUnderscore{}xgb × p\markdownRendererUnderscore{}xgboost}.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}Apply per-class threshold optimisation to the blended probabilities.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Final weights:} w\markdownRendererUnderscore{}finetune ≈ 0.46, w\markdownRendererUnderscore{}xgboost ≈ 0.54 (data-driven, not hand-tuned).\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Class \markdownRendererCodeSpan{EnsemblePredictor}} provides a unified \markdownRendererCodeSpan{predict\markdownRendererUnderscore{}proba(sequences)} interface\markdownRendererSoftLineBreak
+{}for the blind prediction pipeline.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/evaluation.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Compute metrics, plot confusion matrices, and persist results.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Function \markdownRendererPipe{} Description \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}----------\markdownRendererPipe{}-------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{compute\markdownRendererUnderscore{}metrics(y\markdownRendererUnderscore{}true, y\markdownRendererUnderscore{}pred)} \markdownRendererPipe{} Returns \markdownRendererCodeSpan{\markdownRendererLeftBrace{}accuracy, macro\markdownRendererUnderscore{}f1, balanced\markdownRendererUnderscore{}accuracy, mcc\markdownRendererRightBrace{}} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{plot\markdownRendererUnderscore{}confusion\markdownRendererUnderscore{}matrix(...)} \markdownRendererPipe{} Row-normalised heatmap, saved to PNG \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{print\markdownRendererUnderscore{}metrics\markdownRendererUnderscore{}table(results\markdownRendererUnderscore{}list)} \markdownRendererPipe{} Formatted comparison table \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{plot\markdownRendererUnderscore{}metrics\markdownRendererUnderscore{}comparison(...)} \markdownRendererPipe{} Grouped bar chart of models × metrics \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{plot\markdownRendererUnderscore{}class\markdownRendererUnderscore{}distribution(...)} \markdownRendererPipe{} Class frequency bar chart (log scale) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{plot\markdownRendererUnderscore{}sequence\markdownRendererUnderscore{}length\markdownRendererUnderscore{}distribution(...)} \markdownRendererPipe{} Per-class histograms \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{save\markdownRendererUnderscore{}results\markdownRendererUnderscore{}json(data, path)} \markdownRendererPipe{} JSON with numpy type conversion \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/interpretability.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Feature importance, SHAP analysis, and per-class error breakdown.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Analyses implemented (4 techniques for extra credit):}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBegin
+\markdownRendererOlItemWithNumber{1}\markdownRendererStrongEmphasis{Feature importance} — Gini importance for tree-based models; permutation importance\markdownRendererSoftLineBreak
+{}as a model-agnostic alternative. Top-20 bar chart.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}\markdownRendererStrongEmphasis{SHAP values} — \markdownRendererCodeSpan{TreeExplainer} for XGBoost on a random subsample of 500 sequences.\markdownRendererSoftLineBreak
+{}Summary plot of mean \markdownRendererPipe{}SHAP\markdownRendererPipe{} per feature.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}\markdownRendererStrongEmphasis{Per-class precision / recall / F1} — bar chart with per-class breakdown.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}\markdownRendererStrongEmphasis{High-confidence error analysis} — breakdown of misclassifications where p ≥ 0.80,\markdownRendererSoftLineBreak
+{}grouped by true and predicted class.\markdownRendererOlItemEnd 
+\markdownRendererOlEnd \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/confidence.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Map predicted probabilities to confidence levels.\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Level \markdownRendererPipe{} Condition \markdownRendererPipe{} Challenge Score \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}-----------\markdownRendererPipe{}-----------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} High \markdownRendererPipe{} max(p) ≥ 0.80 \markdownRendererPipe{} ±1 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Medium \markdownRendererPipe{} 0.50 ≤ max(p) < 0.80 \markdownRendererPipe{} ±0.5 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Low \markdownRendererPipe{} max(p) < 0.50 \markdownRendererPipe{} 0 \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}The \markdownRendererCodeSpan{confidence\markdownRendererUnderscore{}calibration\markdownRendererUnderscore{}report} function generates:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem Per-level accuracy statistics\markdownRendererUlItemEnd 
+\markdownRendererUlItem A \markdownRendererStrongEmphasis{reliability diagram} (calibration curve) saved to \markdownRendererCodeSpan{outputs/figures/reliability\markdownRendererUnderscore{}diagram.png}\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/predict\markdownRendererUnderscore{}blind.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} End-to-end prediction pipeline for the blind challenge test set.\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/65ea270dd67ab349d5ac132f8ecb0073.verbatim}{bash}{bash}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Output format} (one line per sequence, no header):\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/6a2b4448d41b2837a3798ccb8e08c8ca.verbatim}{}{}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Pipeline steps:}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Parse input FASTA with \markdownRendererCodeSpan{Bio.SeqIO}.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Load model artefact(s) from disk.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Extract features (ESM-2 embeddings + physicochemical, or raw sequences for fine-tuned model).\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}Scale features using the saved scaler.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{5}Predict class probabilities.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{6}Apply per-class thresholds (if available).\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{7}Map max probability to confidence level.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{8}Write formatted output.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{\markdownRendererCodeSpan{src/generate\markdownRendererUnderscore{}plots.py}}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Purpose:} Generate combined model-comparison and ablation-study figures from all JSON result files.\markdownRendererParagraphSeparator
+{}Reads \markdownRendererCodeSpan{baseline\markdownRendererUnderscore{}results.json}, \markdownRendererCodeSpan{advanced\markdownRendererUnderscore{}results.json}, \markdownRendererCodeSpan{finetune\markdownRendererUnderscore{}results.json}, and\markdownRendererSoftLineBreak
+{}\markdownRendererCodeSpan{ensemble\markdownRendererUnderscore{}results.json} to produce:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererCodeSpan{outputs/figures/model\markdownRendererUnderscore{}comparison.png}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{outputs/figures/ablation\markdownRendererUnderscore{}results.png}\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{6. Data Pipeline}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/86f2cc3aff05b42d7fc90a6da5ea825f.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{7. Feature Engineering}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{7.1 Handcrafted Features (429-d)}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{Amino acid composition (20-d):} Normalised frequency of each of the 20 canonical amino acids\markdownRendererSoftLineBreak
+{}(A, C, D, E, F, G, H, I, K, L, M, N, P, Q, R, S, T, V, W, Y). Each row sums to \markdownRendererTilde{}1.0.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Dipeptide frequencies (400-d):} Normalised frequency of each ordered pair of canonical amino\markdownRendererSoftLineBreak
+{}acids (AA, AC, …, YY). Captures local sequential patterns.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Sequence length (1-d):} Raw integer count of amino acids.\markdownRendererParagraphSeparator
+{}\markdownRendererStrongEmphasis{Physicochemical properties (8-d):}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem Molecular weight (Daltons)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Isoelectric point (pI)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Aromaticity (fraction of Phe + Trp + Tyr)\markdownRendererUlItemEnd 
+\markdownRendererUlItem GRAVY (Kyte–Doolittle grand average of hydropathicity)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Charge at pH 7.0\markdownRendererUlItemEnd 
+\markdownRendererUlItem Helix fraction (Chou–Fasman)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Turn fraction (Chou–Fasman)\markdownRendererUlItemEnd 
+\markdownRendererUlItem Sheet fraction (Chou–Fasman)\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{7.2 ESM-2 Embeddings}\markdownRendererInterblockSeparator
+{}\markdownRendererStrongEmphasis{ESM-2} (Evolutionary Scale Modelling) is a protein language model pre-trained on millions of\markdownRendererSoftLineBreak
+{}protein sequences. We use it as a \markdownRendererStrongEmphasis{feature extractor} — no label information is leaked:\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Tokenise the amino acid sequence.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Forward pass through the transformer.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Mean-pool over the sequence dimension (excluding BOS/EOS special tokens).\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}Output: a dense vector per sequence (320-d for 8M model, 1 280-d for 650M model).\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}Embeddings are \markdownRendererStrongEmphasis{stateless} (no label info) and therefore safe to pre-compute once before\markdownRendererSoftLineBreak
+{}cross-validation. However, \markdownRendererStrongEmphasis{normalisation} (StandardScaler) is still fit on the training fold\markdownRendererSoftLineBreak
+{}only.\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{7.3 Feature Combination Results}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Feature Set \markdownRendererPipe{} Dimensions \markdownRendererPipe{} Macro F1 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------------\markdownRendererPipe{}-----------\markdownRendererPipe{}----------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Handcrafted only \markdownRendererPipe{} 429 \markdownRendererPipe{} 0.206 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} ESM-2 650M only \markdownRendererPipe{} 1 280 \markdownRendererPipe{} 0.562 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} ESM-2 + all Handcrafted \markdownRendererPipe{} 1 709 \markdownRendererPipe{} 0.552 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{ESM-2 + Physicochemical} \markdownRendererPipe{} \markdownRendererStrongEmphasis{1 288} \markdownRendererPipe{} \markdownRendererStrongEmphasis{0.575} \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}Adding the full 429-d handcrafted feature vector to ESM-2 \markdownRendererStrongEmphasis{hurts} performance — the\markdownRendererSoftLineBreak
+{}400 dipeptide dimensions introduce noise that XGBoost cannot ignore. The 8-d physicochemical\markdownRendererSoftLineBreak
+{}features, however, provide complementary signal (especially molecular weight).\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{8. Model Training}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{8.1 Cross-Validation Protocol}\markdownRendererInterblockSeparator
+{}All experiments use \markdownRendererStrongEmphasis{stratified 5-fold cross-validation} with \markdownRendererCodeSpan{seed = 42}. The stratification\markdownRendererSoftLineBreak
+{}ensures each fold preserves the original class proportions.\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{8.2 Class Imbalance Strategies}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Strategy \markdownRendererPipe{} Where Used \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}----------\markdownRendererPipe{}-----------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{class\markdownRendererUnderscore{}weight='balanced'} \markdownRendererPipe{} Logistic Regression, Random Forest \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{scale\markdownRendererUnderscore{}pos\markdownRendererUnderscore{}weight} / sample weights \markdownRendererPipe{} XGBoost \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} SMOTE (on training fold only) \markdownRendererPipe{} XGBoost + SMOTE, LightGBM + SMOTE \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Weighted cross-entropy loss \markdownRendererPipe{} Fine-tuned ESM-2 8M \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{8.3 Metrics}\markdownRendererInterblockSeparator
+{}Every experiment reports \markdownRendererStrongEmphasis{four metrics}:\markdownRendererParagraphSeparator
+{}\markdownRendererPipe{} Metric \markdownRendererPipe{} Why \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}--------\markdownRendererPipe{}-----\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{Accuracy} \markdownRendererPipe{} Overall correctness (biased by class 0) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{Macro F1} \markdownRendererPipe{} Unweighted average F1 across classes — \markdownRendererStrongEmphasis{primary selection metric} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{Balanced Accuracy} \markdownRendererPipe{} Average recall per class \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{MCC} \markdownRendererPipe{} Matthews Correlation Coefficient — robust to imbalance \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{8.4 Model Progression}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/cc8948f2adeb5bad200a704a9fc2cb92.verbatim}{}{}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{9. Evaluation Framework}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{9.1 Metrics Computation}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/6cf2ca2be3b5a04fa10ed70bd6d6f89b.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{9.2 Confusion Matrices}\markdownRendererInterblockSeparator
+{}All confusion matrices are \markdownRendererStrongEmphasis{row-normalised} (each row sums to 1.0), showing the proportion\markdownRendererSoftLineBreak
+{}of true-class samples predicted as each class. Saved as PNG heatmaps.\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{9.3 Result Persistence}\markdownRendererInterblockSeparator
+{}All experiment results are saved as JSON files in \markdownRendererCodeSpan{outputs/}:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererCodeSpan{baseline\markdownRendererUnderscore{}results.json}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{advanced\markdownRendererUnderscore{}results.json}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{finetune\markdownRendererUnderscore{}results.json}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{ensemble\markdownRendererUnderscore{}results.json}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{confidence\markdownRendererUnderscore{}results.json}\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererCodeSpan{interpretability\markdownRendererUnderscore{}results.json}\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{10. Interpretability}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{10.1 Feature Importance}\markdownRendererInterblockSeparator
+{}XGBoost Gini (gain-based) importance shows that \markdownRendererStrongEmphasis{ESM-2 embedding dimensions dominate}\markdownRendererSoftLineBreak
+{}the top-20 features. The most important single handcrafted feature is \markdownRendererCodeSpan{molecular\markdownRendererUnderscore{}weight}\markdownRendererSoftLineBreak
+{}(rank 5). This confirms that ESM-2 captures rich protein representations that subsume most\markdownRendererSoftLineBreak
+{}handcrafted biochemical features.\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{10.2 SHAP Analysis}\markdownRendererInterblockSeparator
+{}SHAP values (TreeExplainer, 500-sample subsample) provide per-instance feature attributions.\markdownRendererSoftLineBreak
+{}The summary plot confirms:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem ESM-2 dimensions 112, 308, 216 are the most globally important.\markdownRendererUlItemEnd 
+\markdownRendererUlItem Physicochemical features contribute modestly but consistently.\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{10.3 Per-Class Error Analysis}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Class \markdownRendererPipe{} Precision \markdownRendererPipe{} Recall \markdownRendererPipe{} F1 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}-----------\markdownRendererPipe{}--------\markdownRendererPipe{}----\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Not enzyme \markdownRendererPipe{} 0.934 \markdownRendererPipe{} 0.938 \markdownRendererPipe{} 0.936 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Oxidoreductase \markdownRendererPipe{} 0.586 \markdownRendererPipe{} 0.629 \markdownRendererPipe{} 0.607 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Transferase \markdownRendererPipe{} 0.579 \markdownRendererPipe{} 0.653 \markdownRendererPipe{} 0.614 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Hydrolase \markdownRendererPipe{} 0.554 \markdownRendererPipe{} 0.565 \markdownRendererPipe{} 0.559 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Lyase \markdownRendererPipe{} 0.329 \markdownRendererPipe{} 0.192 \markdownRendererPipe{} 0.242 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Isomerase \markdownRendererPipe{} 0.554 \markdownRendererPipe{} 0.200 \markdownRendererPipe{} 0.293 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Ligase \markdownRendererPipe{} 0.603 \markdownRendererPipe{} 0.426 \markdownRendererPipe{} 0.499 \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}Lyase and Isomerase have the lowest recall because they are the smallest classes\markdownRendererSoftLineBreak
+{}(600 and 411 samples respectively). The model favours predicting the majority class in\markdownRendererSoftLineBreak
+{}ambiguous cases.\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{10.4 High-Confidence Error Analysis}\markdownRendererInterblockSeparator
+{}Of 5 312 total errors, 1 499 (28.2 \markdownRendererPercentSign{}) are high-confidence errors (p ≥ 0.80). These are\markdownRendererSoftLineBreak
+{}disproportionately:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererStrongEmphasis{True class:} Not enzyme (551), Hydrolase (320), Transferase (311)\markdownRendererUlItemEnd 
+\markdownRendererUlItem \markdownRendererStrongEmphasis{Predicted class:} Not enzyme (785) — the model's strongest attractor\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{11. Confidence Scoring}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/d4dff6324bc4e283f7688aa434fa7b26.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Calibration Results}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Level \markdownRendererPipe{} Count \markdownRendererPipe{} Accuracy \markdownRendererPipe{} Mean Max Prob \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}-------\markdownRendererPipe{}----------\markdownRendererPipe{}---------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} High (p ≥ 0.80) \markdownRendererPipe{} 30 448 (76.6 \markdownRendererPercentSign{}) \markdownRendererPipe{} 95.1 \markdownRendererPercentSign{} \markdownRendererPipe{} 0.959 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Medium (0.50 ≤ p < 0.80) \markdownRendererPipe{} 6 658 (16.7 \markdownRendererPercentSign{}) \markdownRendererPipe{} 66.2 \markdownRendererPercentSign{} \markdownRendererPipe{} 0.663 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Low (p < 0.50) \markdownRendererPipe{} 2 658 (6.7 \markdownRendererPercentSign{}) \markdownRendererPipe{} 41.2 \markdownRendererPercentSign{} \markdownRendererPipe{} 0.411 \markdownRendererPipe{}\markdownRendererParagraphSeparator
+{}The model is \markdownRendererStrongEmphasis{well-calibrated}: high-confidence predictions are genuinely reliable.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{12. Blind Prediction Pipeline}\markdownRendererInterblockSeparator
+{}\markdownRendererCodeSpan{src/predict\markdownRendererUnderscore{}blind.py} provides a complete pipeline that:\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Accepts any FASTA file (not just the training data).\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Detects whether the model artefact is a traditional ML model or a fine-tuned neural network.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Supports ensemble mode when both \markdownRendererCodeSpan{--model} and \markdownRendererCodeSpan{--model-finetune} are provided.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}Applies the same preprocessing (feature extraction + scaling) used during training.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{5}Applies per-class thresholds if they were optimised during training.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{6}Writes output in the exact required format.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Usage Examples}\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/9bf4f4e17ffc1a521e3f72b1d4471466.verbatim}{bash}{bash}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{13. Results Summary}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Final Model Comparison}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Model \markdownRendererPipe{} Accuracy \markdownRendererPipe{} Macro F1 \markdownRendererPipe{} Bal. Acc. \markdownRendererPipe{} MCC \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------\markdownRendererPipe{}----------\markdownRendererPipe{}----------\markdownRendererPipe{}-----------\markdownRendererPipe{}-----\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Logistic Regression \markdownRendererPipe{} 0.457 ± 0.003 \markdownRendererPipe{} 0.191 ± 0.002 \markdownRendererPipe{} 0.300 ± 0.010 \markdownRendererPipe{} 0.171 ± 0.003 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Random Forest \markdownRendererPipe{} 0.816 ± 0.001 \markdownRendererPipe{} 0.141 ± 0.002 \markdownRendererPipe{} 0.149 ± 0.001 \markdownRendererPipe{} 0.093 ± 0.011 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Random Forest + PCA(50) \markdownRendererPipe{} 0.816 ± 0.002 \markdownRendererPipe{} 0.197 ± 0.002 \markdownRendererPipe{} 0.185 ± 0.001 \markdownRendererPipe{} 0.216 ± 0.006 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} XGBoost (ESM-2 650M + Physico) \markdownRendererPipe{} 0.886 ± 0.003 \markdownRendererPipe{} 0.575 ± 0.013 \markdownRendererPipe{} 0.516 ± 0.011 \markdownRendererPipe{} 0.621 ± 0.010 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} LightGBM (ESM-2 650M + Physico) \markdownRendererPipe{} 0.879 ± 0.003 \markdownRendererPipe{} 0.515 ± 0.013 \markdownRendererPipe{} 0.467 ± 0.008 \markdownRendererPipe{} 0.605 ± 0.010 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} LightGBM + SMOTE \markdownRendererPipe{} 0.880 ± 0.002 \markdownRendererPipe{} 0.576 ± 0.014 \markdownRendererPipe{} 0.535 ± 0.010 \markdownRendererPipe{} 0.620 ± 0.006 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} XGBoost + SMOTE \markdownRendererPipe{} 0.886 ± 0.002 \markdownRendererPipe{} 0.595 ± 0.014 \markdownRendererPipe{} 0.552 ± 0.011 \markdownRendererPipe{} 0.631 ± 0.006 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} ESM-2 8M Fine-tune \markdownRendererPipe{} 0.823 ± 0.008 \markdownRendererPipe{} 0.509 ± 0.013 \markdownRendererPipe{} 0.570 ± 0.015 \markdownRendererPipe{} 0.553 ± 0.008 \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererStrongEmphasis{Ensemble} \markdownRendererPipe{} \markdownRendererStrongEmphasis{0.890} \markdownRendererPipe{} \markdownRendererStrongEmphasis{0.625} \markdownRendererPipe{} \markdownRendererStrongEmphasis{0.604} \markdownRendererPipe{} \markdownRendererStrongEmphasis{0.659} \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Generated Figures (19 total)}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Figure \markdownRendererPipe{} File \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}--------\markdownRendererPipe{}------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Class distribution \markdownRendererPipe{} \markdownRendererCodeSpan{class\markdownRendererUnderscore{}distribution.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Sequence length distribution \markdownRendererPipe{} \markdownRendererCodeSpan{sequence\markdownRendererUnderscore{}length\markdownRendererUnderscore{}distribution.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Confusion matrix (per model) \markdownRendererPipe{} \markdownRendererCodeSpan{cm\markdownRendererUnderscore{}*.png} (10 files) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Model comparison \markdownRendererPipe{} \markdownRendererCodeSpan{model\markdownRendererUnderscore{}comparison.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Ablation results \markdownRendererPipe{} \markdownRendererCodeSpan{ablation\markdownRendererUnderscore{}results.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Feature importance \markdownRendererPipe{} \markdownRendererCodeSpan{feature\markdownRendererUnderscore{}importance.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} SHAP importance \markdownRendererPipe{} \markdownRendererCodeSpan{shap\markdownRendererUnderscore{}importance.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Per-class metrics \markdownRendererPipe{} \markdownRendererCodeSpan{per\markdownRendererUnderscore{}class\markdownRendererUnderscore{}metrics.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Reliability diagram \markdownRendererPipe{} \markdownRendererCodeSpan{reliability\markdownRendererUnderscore{}diagram.png} \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} High-confidence errors \markdownRendererPipe{} \markdownRendererCodeSpan{high\markdownRendererUnderscore{}confidence\markdownRendererUnderscore{}errors.png} \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{14. Data-Leakage Prevention}\markdownRendererInterblockSeparator
+{}These rules are enforced throughout the codebase:\markdownRendererInterblockSeparator
+{}\markdownRendererOlBegin
+\markdownRendererOlItemWithNumber{1}\markdownRendererStrongEmphasis{Stratified K-Fold first.} Fold indices are created before any feature computation or\markdownRendererSoftLineBreak
+{}normalisation.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}\markdownRendererStrongEmphasis{Scalers fit on training fold only.} \markdownRendererCodeSpan{StandardScaler.fit()} is called only on \markdownRendererCodeSpan{X[train\markdownRendererUnderscore{}idx]}.\markdownRendererSoftLineBreak
+{}The validation fold is transformed with \markdownRendererCodeSpan{.transform()} only.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}\markdownRendererStrongEmphasis{SMOTE on training fold only.} Synthetic minority samples are generated only from the\markdownRendererSoftLineBreak
+{}training fold. The validation fold remains untouched.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{4}\markdownRendererStrongEmphasis{No target leakage.} All features derive solely from the amino acid sequence — never from\markdownRendererSoftLineBreak
+{}the label.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{5}\markdownRendererStrongEmphasis{ESM-2 embeddings are stateless.} The forward pass through a pre-trained model uses no\markdownRendererSoftLineBreak
+{}label information, so embeddings are safe to pre-compute once. But normalisation still\markdownRendererSoftLineBreak
+{}follows rule 2.\markdownRendererOlItemEnd 
+\markdownRendererOlEnd \markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{15. Reproducibility}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Random Seeds}\markdownRendererInterblockSeparator
+{}All random number generators are seeded with \markdownRendererCodeSpan{42}:\markdownRendererInterblockSeparator
+{}\markdownRendererInputFencedCode{./_markdown_DEVELOPER_GUIDE/aa516ecd2d7da3ed6e224d510832e2c8.verbatim}{python}{python}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Deterministic Behaviour}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem \markdownRendererCodeSpan{StratifiedKFold(shuffle=True, random\markdownRendererUnderscore{}state=42)} ensures identical folds.\markdownRendererUlItemEnd 
+\markdownRendererUlItem XGBoost and LightGBM use \markdownRendererCodeSpan{random\markdownRendererUnderscore{}state=42}.\markdownRendererUlItemEnd 
+\markdownRendererUlItem PyTorch fine-tuning seeds are set per fold.\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Result Persistence}\markdownRendererInterblockSeparator
+{}All experiment results are saved as JSON files with full metric dictionaries,\markdownRendererSoftLineBreak
+{}enabling exact reproduction of figures and tables without retraining.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{16. Extension Guide}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{Adding a New Feature Extractor}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Create \markdownRendererCodeSpan{src/features/new\markdownRendererUnderscore{}feature.py} following the pattern of \markdownRendererCodeSpan{composition.py}:\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem Implement \markdownRendererCodeSpan{extract\markdownRendererUnderscore{}new\markdownRendererUnderscore{}features(sequences: list[str]) -> np.ndarray}.\markdownRendererUlItemEnd 
+\markdownRendererUlItem Implement \markdownRendererCodeSpan{get\markdownRendererUnderscore{}feature\markdownRendererUnderscore{}names() -> list[str]}.\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Add the new features to the ablation study in \markdownRendererCodeSpan{src/models/advanced.py}.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Update \markdownRendererCodeSpan{src/predict\markdownRendererUnderscore{}blind.py} to handle the new feature source.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Adding a New Model}\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Create a factory function in \markdownRendererCodeSpan{src/models/} (e.g., \markdownRendererCodeSpan{make\markdownRendererUnderscore{}catboost()}).\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Call it through \markdownRendererCodeSpan{cross\markdownRendererUnderscore{}validate\markdownRendererUnderscore{}model} in \markdownRendererCodeSpan{src/training.py}.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Add the results to the comparison table in \markdownRendererCodeSpan{src/evaluation.py}.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Upgrading the ESM-2 Model}\markdownRendererInterblockSeparator
+{}To use \markdownRendererCodeSpan{esm2\markdownRendererUnderscore{}t33\markdownRendererUnderscore{}650M\markdownRendererUnderscore{}UR50D} for fine-tuning (instead of the 8M model):\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Update \markdownRendererCodeSpan{ESM\markdownRendererUnderscore{}MODEL\markdownRendererUnderscore{}NAME} and \markdownRendererCodeSpan{EMB\markdownRendererUnderscore{}DIM} in \markdownRendererCodeSpan{src/models/finetune.py}.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Reduce \markdownRendererCodeSpan{MAX\markdownRendererUnderscore{}LEN} and \markdownRendererCodeSpan{batch\markdownRendererUnderscore{}size} to fit in VRAM (24 GB+ recommended).\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{3}Consider freezing early transformer layers to reduce memory.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Potential Improvements}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} Improvement \markdownRendererPipe{} Expected Impact \markdownRendererPipe{} Difficulty \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}-------------\markdownRendererPipe{}----------------\markdownRendererPipe{}------------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Fine-tune 650M model \markdownRendererPipe{} +5–10 \markdownRendererPercentSign{} Macro F1 \markdownRendererPipe{} High (24 GB+ VRAM) \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Focal loss in fine-tuning \markdownRendererPipe{} +2–5 \markdownRendererPercentSign{} on minority classes \markdownRendererPipe{} Medium \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Hierarchical classification \markdownRendererPipe{} +1–3 \markdownRendererPercentSign{} Macro F1 \markdownRendererPipe{} Medium \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Per-class threshold tuning on ensemble \markdownRendererPipe{} +0.5–1 \markdownRendererPercentSign{} \markdownRendererPipe{} Low \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} Sequence-level attention visualisation \markdownRendererPipe{} Interpretability only \markdownRendererPipe{} High \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{17. Troubleshooting}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{CUDA Out of Memory}\markdownRendererInterblockSeparator
+{}\markdownRendererUlBeginTight
+\markdownRendererUlItem Reduce \markdownRendererCodeSpan{--batch-size} in embedding extraction or fine-tuning.\markdownRendererUlItemEnd 
+\markdownRendererUlItem Use \markdownRendererCodeSpan{--max-len 256} in fine-tuning to reduce VRAM.\markdownRendererUlItemEnd 
+\markdownRendererUlItem Use \markdownRendererCodeSpan{--grad-accum 8} to maintain effective batch size with smaller GPU batches.\markdownRendererUlItemEnd 
+\markdownRendererUlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{ESM-2 Model Download Fails}\markdownRendererInterblockSeparator
+{}The \markdownRendererCodeSpan{fair-esm} library downloads model weights on first use. If behind a firewall:\markdownRendererInterblockSeparator
+{}\markdownRendererOlBeginTight
+\markdownRendererOlItemWithNumber{1}Download the checkpoint manually from https://github.com/facebookresearch/esm.\markdownRendererOlItemEnd 
+\markdownRendererOlItemWithNumber{2}Place it in the \markdownRendererCodeSpan{torch.hub} cache directory.\markdownRendererOlItemEnd 
+\markdownRendererOlEndTight \markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{SMOTE Fails on Small Classes}\markdownRendererInterblockSeparator
+{}SMOTE requires at least \markdownRendererCodeSpan{k\markdownRendererUnderscore{}neighbors + 1} samples per class. With default \markdownRendererCodeSpan{k=5}, classes\markdownRendererSoftLineBreak
+{}with ≤ 5 samples will fail. Our smallest class (Ligase, n = 282) is well above this threshold,\markdownRendererSoftLineBreak
+{}but if you subsample the data, reduce \markdownRendererCodeSpan{k\markdownRendererUnderscore{}neighbors} accordingly.\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Mismatched Feature Dimensions in predict\markdownRendererUnderscore{}blind}\markdownRendererInterblockSeparator
+{}The saved model expects the same feature dimensionality as during training. If you change\markdownRendererSoftLineBreak
+{}the ESM-2 model (8M ↔ 650M) or feature combination, retrain and save a new artefact.\markdownRendererInterblockSeparator
+{}\markdownRendererThematicBreak{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingTwo{Appendix: Output Files Reference}\markdownRendererInterblockSeparator
+{}\markdownRendererSectionBegin
+\markdownRendererHeadingThree{JSON Result Files}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} File \markdownRendererPipe{} Content \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}------\markdownRendererPipe{}---------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{baseline\markdownRendererUnderscore{}results.json} \markdownRendererPipe{} 3 baseline models: per-fold and summary metrics \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{advanced\markdownRendererUnderscore{}results.json} \markdownRendererPipe{} 5 advanced models + 4 ablation configs + best model params \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{finetune\markdownRendererUnderscore{}results.json} \markdownRendererPipe{} 5-fold fine-tuning metrics + configuration \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{ensemble\markdownRendererUnderscore{}results.json} \markdownRendererPipe{} Ensemble weights, thresholds, blended metrics \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{confidence\markdownRendererUnderscore{}results.json} \markdownRendererPipe{} Per-level accuracy and mean probability \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{interpretability\markdownRendererUnderscore{}results.json} \markdownRendererPipe{} Top features, per-class metrics, high-confidence errors \markdownRendererPipe{}\markdownRendererInterblockSeparator
+{}
+\markdownRendererSectionEnd \markdownRendererSectionBegin
+\markdownRendererHeadingThree{Model Artefacts}\markdownRendererInterblockSeparator
+{}\markdownRendererPipe{} File \markdownRendererPipe{} Content \markdownRendererPipe{} Size \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{}------\markdownRendererPipe{}---------\markdownRendererPipe{}------\markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{best\markdownRendererUnderscore{}model.joblib} \markdownRendererPipe{} XGBoost + scaler + thresholds + OOF data \markdownRendererPipe{} \markdownRendererTilde{}50 MB \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{finetune\markdownRendererUnderscore{}artifact.joblib} \markdownRendererPipe{} FinetunePredictor (lazy-loads PyTorch model) \markdownRendererPipe{} \markdownRendererTilde{}1 MB \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{finetune\markdownRendererUnderscore{}final.pt} \markdownRendererPipe{} PyTorch state dict (full-dataset retrained) \markdownRendererPipe{} \markdownRendererTilde{}35 MB \markdownRendererPipe{}\markdownRendererSoftLineBreak
+{}\markdownRendererPipe{} \markdownRendererCodeSpan{finetune\markdownRendererUnderscore{}fold\markdownRendererLeftBrace{}1-5\markdownRendererRightBrace{}.pt} \markdownRendererPipe{} Per-fold best checkpoints \markdownRendererPipe{} \markdownRendererTilde{}35 MB each \markdownRendererPipe{}
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd 
+\markdownRendererSectionEnd \markdownRendererDocumentEnd

@@ -1,0 +1,5 @@
+python -m src.predict_blind \
+    --fasta <blind_test.fasta> \
+    --model outputs/models/best_model.joblib \
+    --model-finetune outputs/models/finetune_artifact.joblib \
+    --output outputs/predictions/blind_predictions.txt

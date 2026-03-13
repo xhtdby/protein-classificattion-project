@@ -1,0 +1,33 @@
+┌────────────────────────────────────────────────────────────────────┐
+│                        Data Layer                                  │
+│  data_loading.py: FASTA parsing → DataFrame → stratified CV splits │
+└───────────┬────────────────────────────────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                     Feature Layer                                  │
+│  composition.py      → 421-d (AA freq + dipeptide + length)        │
+│  physicochemical.py  → 8-d  (MW, pI, GRAVY, charge, SS fracs)     │
+│  embeddings.py       → 320-d / 1280-d (ESM-2 mean-pooled)         │
+│  Combined            → 1288-d (ESM-2 650M + physicochemical)       │
+└───────────┬────────────────────────────────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                     Training Layer                                  │
+│  training.py: leak-safe CV loop (scaler + SMOTE on train only)     │
+│  baseline.py:  Logistic Regression, Random Forest                  │
+│  advanced.py:  XGBoost, LightGBM, ablation, threshold optimisation │
+│  finetune.py:  ESM-2 8M end-to-end fine-tuning (PyTorch)          │
+│  ensemble.py:  Soft-vote fusion of fine-tuned 8M + XGBoost 650M   │
+└───────────┬────────────────────────────────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                   Evaluation & Output Layer                         │
+│  evaluation.py:       metrics, confusion matrices, comparison plots │
+│  interpretability.py: feature importance, SHAP, error analysis      │
+│  confidence.py:       probability → High / Medium / Low calibration │
+│  predict_blind.py:    FASTA → model → formatted predictions         │
+│  generate_plots.py:   combined model comparison figures              │
+└────────────────────────────────────────────────────────────────────┘

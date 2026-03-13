@@ -1,0 +1,8 @@
+{
+    "model_name": str,
+    "fold_metrics": [{"accuracy": ..., "macro_f1": ..., ...}, ...],
+    "summary": {"accuracy_mean": ..., "accuracy_std": ..., ...},
+    "oof_preds": np.ndarray,   # out-of-fold predictions
+    "oof_proba": np.ndarray,   # out-of-fold probability vectors
+    "oof_true": np.ndarray     # ground truth labels
+}

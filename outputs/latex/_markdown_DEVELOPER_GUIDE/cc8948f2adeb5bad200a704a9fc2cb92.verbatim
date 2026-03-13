@@ -1,0 +1,6 @@
+Logistic Regression (handcrafted)     → Macro F1: 0.191  (floor)
+Random Forest (handcrafted)           → Macro F1: 0.141
+XGBoost (ESM-2 650M + physico)        → Macro F1: 0.575  (+200 %)
+XGBoost + SMOTE                       → Macro F1: 0.595  (+3.5 %)
+Fine-tuned ESM-2 8M                   → Macro F1: 0.509
+Ensemble (8M FT + XGBoost 650M)       → Macro F1: 0.625  (+5 %)

@@ -1,0 +1,10 @@
+{
+    "model": trained_xgboost,
+    "scaler": fitted_StandardScaler,
+    "feature_source": "ESM-2 + Physicochemical",
+    "esm_model": "esm2_t33_650M_UR50D",
+    "thresholds": np.ndarray,
+    "oof_preds": np.ndarray,
+    "oof_proba": np.ndarray,
+    "oof_true": np.ndarray
+}

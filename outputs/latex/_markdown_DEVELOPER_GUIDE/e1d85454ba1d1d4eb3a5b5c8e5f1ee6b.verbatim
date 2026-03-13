@@ -1,0 +1,8 @@
+Phase 1: python -m src.data_loading           # verify data
+Phase 2: python -m src.models.baseline        # handcrafted baselines
+Phase 3: python -m src.features.embeddings    # ESM-2 extraction
+Phase 4: python -m src.models.advanced        # XGBoost/LightGBM + ablation
+Phase 5: python -m src.models.finetune        # end-to-end fine-tuning
+Phase 6: python -m src.models.ensemble        # ensemble evaluation
+Phase 7: python -m src.interpretability       # feature importance & SHAP
+Phase 8: python -m src.confidence             # confidence calibration

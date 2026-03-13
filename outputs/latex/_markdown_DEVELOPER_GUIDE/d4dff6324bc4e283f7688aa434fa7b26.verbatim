@@ -1,0 +1,4 @@
+from src.confidence import assign_confidence
+
+confidences = assign_confidence(proba)  # proba shape: (N, 7)
+# Returns: ["High", "Medium", "Low", ...]

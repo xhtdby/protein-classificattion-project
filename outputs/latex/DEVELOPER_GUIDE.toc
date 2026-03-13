@@ -1,0 +1,29 @@
+\contentsline {section}{\numberline {1}Project Overview}{3}{section.1}%
+\contentsline {section}{\numberline {2}Environment Setup}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Prerequisites}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Installation}{3}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Dataset Description}{4}{section.3}%
+\contentsline {section}{\numberline {4}Architecture Overview}{4}{section.4}%
+\contentsline {section}{\numberline {5}Execution Order}{5}{section.5}%
+\contentsline {section}{\numberline {6}Module Reference}{5}{section.6}%
+\contentsline {subsection}{\numberline {6.1}data\_loading.py}{5}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}features/composition.py}{5}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}features/physicochemical.py}{5}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}features/embeddings.py}{5}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}training.py}{6}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}models/baseline.py}{6}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7}models/advanced.py}{6}{subsection.6.7}%
+\contentsline {subsection}{\numberline {6.8}models/finetune.py}{6}{subsection.6.8}%
+\contentsline {subsection}{\numberline {6.9}models/ensemble.py}{6}{subsection.6.9}%
+\contentsline {subsection}{\numberline {6.10}predict\_blind.py}{6}{subsection.6.10}%
+\contentsline {section}{\numberline {7}Data-Leakage Prevention}{6}{section.7}%
+\contentsline {section}{\numberline {8}Reproducibility}{6}{section.8}%
+\contentsline {section}{\numberline {9}Results Summary (Generated Artifacts)}{7}{section.9}%
+\contentsline {section}{\numberline {10}Figures and Outputs}{7}{section.10}%
+\contentsline {section}{\numberline {11}Troubleshooting}{8}{section.11}%
+\contentsline {subsection}{\numberline {11.1}CUDA Out of Memory}{8}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}SMOTE Failure}{8}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}Dimension Mismatch in Blind Prediction}{8}{subsection.11.3}%
+\contentsline {section}{\numberline {12}Appendix: Output File Reference}{8}{section.12}%
+\contentsline {subsection}{\numberline {12.1}JSON Files}{8}{subsection.12.1}%
+\contentsline {subsection}{\numberline {12.2}Model and Cache Artifacts}{9}{subsection.12.2}%

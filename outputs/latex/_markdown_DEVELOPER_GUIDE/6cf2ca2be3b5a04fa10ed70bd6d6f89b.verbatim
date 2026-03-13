@@ -1,0 +1,4 @@
+from src.evaluation import compute_metrics
+
+metrics = compute_metrics(y_true, y_pred)
+# {'accuracy': 0.886, 'macro_f1': 0.595, 'balanced_accuracy': 0.552, 'mcc': 0.631}

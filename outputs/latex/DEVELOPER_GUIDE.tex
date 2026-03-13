@@ -1,0 +1,296 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\setlist{nosep}
+\onehalfspacing
+
+\title{Developer Guide --- Protein Enzyme Classification Project}
+\author{}
+\date{Last updated: March 2026}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Project Overview}
+This project implements a 7-class supervised classification system that predicts whether a
+protein is an enzyme and, if so, its top-level Enzyme Commission (EC) class.
+
+\begin{table}[H]
+\centering
+\caption{Class distribution used throughout training and evaluation.}
+\begin{tabular}{lrrr}
+\toprule
+Class & Label & Count & Proportion \\
+\midrule
+0 & Not an enzyme & 32410 & 81.5\% \\
+1 & Oxidoreductase & 1184 & 3.0\% \\
+2 & Transferase & 2769 & 7.0\% \\
+3 & Hydrolase & 2108 & 5.3\% \\
+4 & Lyase & 600 & 1.5\% \\
+5 & Isomerase & 411 & 1.0\% \\
+6 & Ligase & 282 & 0.7\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Technology stack:
+\begin{itemize}
+\item Python 3.10+
+\item scikit-learn, XGBoost, LightGBM, PyTorch
+\item ESM-2 via fair-esm
+\item BioPython for FASTA and ProtParam features
+\item matplotlib, seaborn, SHAP
+\end{itemize}
+
+\section{Environment Setup}
+\subsection{Prerequisites}
+\begin{itemize}
+\item Python $\ge$ 3.10
+\item CUDA-capable GPU recommended for ESM extraction and fine-tuning
+\item Approximately 12 GB disk for embeddings and checkpoints
+\end{itemize}
+
+\subsection{Installation}
+\begin{verbatim}
+# 1) Clone repository
+git clone <repo-url>
+cd protein-classification
+
+# 2) Create venv
+python -m venv .venv
+
+# 3) Activate (Windows PowerShell)
+.\.venv\Scripts\Activate.ps1
+
+# 4) Install dependencies
+pip install -r requirements.txt
+\end{verbatim}
+
+\section{Dataset Description}
+Seven FASTA files in workspace root map to labels 0--6:
+\begin{verbatim}
+class0_rep_seq.fasta.txt
+ec1_rep_seq.fasta.txt
+ec2_rep_seq.fasta.txt
+ec3_rep_seq.fasta.txt
+ec4_rep_seq.fasta.txt
+ec5_rep_seq.fasta.txt
+ec6_rep_seq.fasta.txt
+\end{verbatim}
+
+All sequences are representative and non-homologous after clustering.
+No additional deduplication is required.
+
+\section{Architecture Overview}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{../figures/model_comparison.png}
+\caption{High-level model family outcomes used to guide architecture choices.}
+\end{figure}
+
+Data and module flow:
+\begin{enumerate}
+\item \texttt{src/data\_loading.py}: FASTA parsing and CV split generation
+\item \texttt{src/features/*}: composition, physicochemical, ESM-2 embeddings
+\item \texttt{src/training.py}: leak-safe CV and threshold optimisation utilities
+\item \texttt{src/models/*}: baseline, advanced, finetune, ensemble
+\item \texttt{src/evaluation.py}, \texttt{src/interpretability.py}, \texttt{src/confidence.py}
+\item \texttt{src/predict\_blind.py}: FASTA to final formatted predictions
+\end{enumerate}
+
+\section{Execution Order}
+\begin{verbatim}
+Phase 1: python -m src.data_loading
+Phase 2: python -m src.models.baseline
+Phase 3: python -m src.features.embeddings
+Phase 4: python -m src.models.advanced
+Phase 5: python -m src.models.finetune
+Phase 6: python -m src.models.ensemble
+Phase 7: python -m src.interpretability
+Phase 8: python -m src.confidence
+\end{verbatim}
+
+Phases 2 and 3 can run in parallel. Remaining phases are sequential.
+
+\section{Module Reference}
+\subsection{data\_loading.py}
+Purpose: parse all FASTA sources into a single dataframe and generate stratified splits.
+Core outputs include \texttt{seq\_id}, \texttt{sequence}, \texttt{label}, and length.
+
+\subsection{features/composition.py}
+Implements amino acid composition (20), dipeptide frequencies (400), and sequence length (1),
+yielding 421-dimensional handcrafted vectors.
+
+\subsection{features/physicochemical.py}
+Implements an 8-dimensional biophysical vector:
+\begin{itemize}
+\item molecular weight
+\item isoelectric point
+\item aromaticity
+\item GRAVY
+\item charge at pH 7.0
+\item helix, turn, sheet fractions
+\end{itemize}
+
+\subsection{features/embeddings.py}
+Extracts mean-pooled ESM-2 embeddings.
+Supported models:
+\begin{itemize}
+\item \texttt{esm2\_t6\_8M\_UR50D} (320-d)
+\item \texttt{esm2\_t33\_650M\_UR50D} (1280-d)
+\end{itemize}
+
+Behavioral guarantees:
+\begin{itemize}
+\item truncation warning for sequences over 1022 tokens
+\item exclusion of BOS/EOS from mean pooling
+\item CUDA to MPS to CPU fallback
+\item disk caching under \texttt{outputs/features/}
+\end{itemize}
+
+\subsection{training.py}
+Provides leak-safe cross-validation with optional scaler and SMOTE per training fold only.
+Also provides per-class threshold optimisation.
+
+\subsection{models/baseline.py}
+Runs Logistic Regression and Random Forest baselines (including RF+PCA variant) on handcrafted features.
+
+\subsection{models/advanced.py}
+Runs XGBoost and LightGBM variants on ESM-2 650M + physicochemical features,
+plus ablation studies and best-model artifact packaging.
+
+\subsection{models/finetune.py}
+End-to-end fine-tuning for ESM-2 8M with differential learning rates, mixed precision,
+early stopping, and fold-local class weighting.
+
+\subsection{models/ensemble.py}
+Soft-vote OOF blending between fine-tuned ESM-2 8M and XGBoost+SMOTE 650M.
+Automatically consumes cached XGBoost OOF arrays when available.
+
+\subsection{predict\_blind.py}
+Inference entrypoint for blind challenge format. Supports:
+\begin{itemize}
+\item XGBoost artifact only
+\item fine-tuned artifact only
+\item ensemble mode when both are supplied
+\end{itemize}
+
+\section{Data-Leakage Prevention}
+Critical rules:
+\begin{enumerate}
+\item Stratified split indices first.
+\item Fit scalers on training fold only.
+\item Apply SMOTE on training fold only.
+\item No label-derived feature construction.
+\item Embedding extraction is stateless; normalisation remains fold-local.
+\end{enumerate}
+
+\section{Reproducibility}
+All RNG seeds are fixed to 42 across random, NumPy, and PyTorch.
+Stratified K-fold uses shuffling with fixed random state.
+Result files are persisted as JSON and model artifacts for reproducibility without retraining.
+
+\section{Results Summary (Generated Artifacts)}
+\begin{table}[H]
+\centering
+\caption{Final comparison including generated ensemble metrics.}
+\begin{tabular}{lcccc}
+\toprule
+Model & Accuracy & Macro F1 & Bal. Acc. & MCC \\
+\midrule
+Logistic Regression & 0.457 & 0.191 & 0.300 & 0.171 \\
+Random Forest & 0.816 & 0.141 & 0.149 & 0.093 \\
+Random Forest + PCA(50) & 0.816 & 0.197 & 0.185 & 0.216 \\
+XGBoost (650M + physico) & 0.886 & 0.575 & 0.516 & 0.621 \\
+LightGBM (650M + physico) & 0.879 & 0.515 & 0.467 & 0.605 \\
+LightGBM + SMOTE & 0.880 & 0.576 & 0.535 & 0.620 \\
+XGBoost + SMOTE & 0.886 & 0.595 & 0.552 & 0.631 \\
+ESM-2 8M Fine-tune & 0.823 & 0.509 & 0.570 & 0.553 \\
+\textbf{Ensemble} & \textbf{0.890} & \textbf{0.625} & \textbf{0.605} & \textbf{0.659} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Ensemble-specific generated values from \texttt{outputs/ensemble\_results.json}.}
+\begin{tabular}{lc}
+\toprule
+Quantity & Value \\
+\midrule
+$w_{\mathrm{finetune}}$ & 0.4608 \\
+$w_{\mathrm{xgboost}}$ & 0.5392 \\
+Macro F1 (plain blend) & 0.6246 \\
+Macro F1 (optimised thresholds) & 0.6247 \\
+Threshold vector & [1.0000, 0.9999, 0.9999, 0.9999, 1.0000, 0.9999, 0.9999] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Figures and Outputs}
+Generated figures currently present under \texttt{outputs/figures/}:
+\begin{itemize}
+\item \texttt{class\_distribution.png}
+\item \texttt{sequence\_length\_distribution.png}
+\item \texttt{model\_comparison.png}
+\item \texttt{ablation\_results.png}
+\item \texttt{feature\_importance.png}
+\item \texttt{shap\_importance.png}
+\item \texttt{per\_class\_metrics.png}
+\item \texttt{reliability\_diagram.png}
+\item \texttt{high\_confidence\_errors.png}
+\item \texttt{cm\_*.png} confusion matrices including \texttt{cm\_ensemble.png}
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{../figures/cm_ensemble.png}
+\caption{Ensemble confusion matrix generated from blended OOF probabilities.}
+\end{figure}
+
+\section{Troubleshooting}
+\subsection{CUDA Out of Memory}
+Reduce batch size, reduce max sequence length, or increase gradient accumulation.
+
+\subsection{SMOTE Failure}
+If class sizes become too small in custom subsets, reduce \texttt{k\_neighbors}.
+
+\subsection{Dimension Mismatch in Blind Prediction}
+When changing feature source or ESM model size, retrain and resave artifacts
+so expected feature dimensionality remains consistent.
+
+\section{Appendix: Output File Reference}
+\subsection{JSON Files}
+\begin{itemize}
+\item \texttt{outputs/baseline\_results.json}
+\item \texttt{outputs/advanced\_results.json}
+\item \texttt{outputs/finetune\_results.json}
+\item \texttt{outputs/ensemble\_results.json}
+\item \texttt{outputs/confidence\_results.json}
+\item \texttt{outputs/interpretability\_results.json}
+\end{itemize}
+
+\subsection{Model and Cache Artifacts}
+\begin{itemize}
+\item \texttt{outputs/models/best\_model.joblib}
+\item \texttt{outputs/models/finetune\_artifact.joblib}
+\item \texttt{outputs/models/finetune\_final.pt}
+\item \texttt{outputs/models/xgb\_oof\_proba.npy}
+\item \texttt{outputs/models/xgb\_oof\_true.npy}
+\end{itemize}
+
+\end{document}

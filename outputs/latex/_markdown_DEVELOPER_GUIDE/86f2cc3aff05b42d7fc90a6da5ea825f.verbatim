@@ -1,0 +1,14 @@
+from pathlib import Path
+from src.data_loading import load_all_sequences, get_cv_splits
+
+# Load all 39 764 sequences
+df = load_all_sequences(Path("."))
+sequences = df["sequence"].tolist()
+labels = df["label"].values
+
+# Generate stratified 5-fold CV splits (seed = 42)
+cv_splits = get_cv_splits(labels, n_splits=5, seed=42)
+
+# Each fold preserves the original class proportions
+for train_idx, val_idx in cv_splits:
+    print(f"Train: {len(train_idx)}, Val: {len(val_idx)}")
