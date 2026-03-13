@@ -28,5 +28,3 @@ Thumbs.db
 .DS_Store
 
 # Model artifacts (large binary -- regenerate by training)
-outputs/models/*.joblib
-outputs/models/*.pt
