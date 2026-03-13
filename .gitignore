@@ -1,24 +1,28 @@
 # Virtual environment
 .venv/
+venv/
+env/
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
 
 # Large cached features (regenerate with scripts)
 outputs/features/*.npy
 
-# # Temporary scratch logs
-# advanced_esm_log.txt
-# interp_log.txt
-# outputs/interp_log*.txt
-# outputs/interp_subprocess.txt
-# outputs/test_stdout.txt
-# outputs/*_run.txt
-# outputs/*_log*.txt
+# Model artifacts (large binary — regenerate by training)
+outputs/models/*.joblib
+outputs/models/*.pt
+outputs/models/*.npy
 
-# Coursework HTML
+# Scratch / log files
+*.log
+outputs/*_run.txt
+outputs/*_log*.txt
+
+# Coursework prompt HTML
 *.html
 
 # IDE / OS
@@ -26,5 +30,9 @@ outputs/features/*.npy
 .idea/
 Thumbs.db
 .DS_Store
+*.swp
+*~
 
-# Model artifacts (large binary -- regenerate by training)
+# Internal dev artifacts
+old chat.txt
+plan.md

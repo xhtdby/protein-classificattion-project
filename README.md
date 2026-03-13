@@ -1,174 +1,183 @@
 # COMP0082 — Protein Enzyme Classification
 
-7-class classification of protein sequences into EC (Enzyme Commission) classes using machine learning.
+Seven-class supervised classification of protein sequences into Enzyme Commission (EC)
+classes using machine learning and protein language model embeddings.
 
-## Setup
+## Quick Start
 
 ```bash
-# Install PyTorch with CUDA support (for NVIDIA GPU)
+# 1. Install PyTorch (CUDA 12.4 — adjust URL for your hardware)
 pip install torch --index-url https://download.pytorch.org/whl/cu124
 
-# Install remaining dependencies
+# 2. Install remaining dependencies
 pip install -r requirements.txt
+
+# 3. Run the full pipeline (steps 1–8 below)
 ```
 
 ## Project Structure
 
 ```
-src/
-├── data_loading.py          # FASTA parsing, label assignment, CV splits
-├── features/
-│   ├── composition.py       # AA composition, dipeptide frequencies
-│   ├── physicochemical.py   # MW, pI, GRAVY, charge, aromaticity
-│   └── embeddings.py        # ESM-2 protein language model embeddings
-├── models/
-│   ├── baseline.py          # Logistic Regression, Random Forest
-│   ├── advanced.py          # XGBoost, LightGBM, feature ablation
-│   ├── finetune.py          # End-to-end ESM-2 8M fine-tuning
-│   └── ensemble.py          # Soft-vote ensemble: fine-tuned 8M + XGBoost 650M
-├── training.py              # Cross-validation loop (leak-safe)
-├── evaluation.py            # Metrics, confusion matrix, comparison plots
-├── interpretability.py      # Feature importance, ablation, error analysis
-├── confidence.py            # Probability -> High/Medium/Low
-└── predict_blind.py         # Blind challenge prediction pipeline
+protein-classification/
+├── src/
+│   ├── data_loading.py            # FASTA parsing, label assignment, stratified CV splits
+│   ├── features/
+│   │   ├── composition.py         # AA composition (20-d) + dipeptide frequencies (400-d)
+│   │   ├── physicochemical.py     # MW, pI, GRAVY, charge, aromaticity, SS fractions (8-d)
+│   │   └── embeddings.py          # ESM-2 mean-pooled embedding extraction (320/1280-d)
+│   ├── models/
+│   │   ├── baseline.py            # Logistic Regression, Random Forest
+│   │   ├── advanced.py            # XGBoost, LightGBM + SMOTE, ablation study
+│   │   ├── finetune.py            # End-to-end ESM-2 8M fine-tuning (PyTorch)
+│   │   └── ensemble.py            # Soft-vote ensemble (fine-tuned 8M + XGBoost 650M)
+│   ├── training.py                # Leak-safe CV loop with scaler/SMOTE on train fold only
+│   ├── evaluation.py              # Metrics, confusion matrices, comparison plots
+│   ├── interpretability.py        # Feature importance, SHAP, per-class error analysis
+│   ├── confidence.py              # Probability → High / Medium / Low mapping
+│   ├── predict_blind.py           # Blind challenge prediction pipeline
+│   └── generate_plots.py          # Model comparison and ablation figures
+├── outputs/
+│   ├── models/                    # Saved model artefacts (.joblib, .pt)
+│   ├── figures/                   # 19 publication-quality PNG plots
+│   └── predictions/               # Blind challenge output files
+├── DEVELOPER_GUIDE.md             # Exhaustive developer documentation
+├── REPORT.md                      # 2 500-word academic submission report
+├── requirements.txt               # Pinned Python dependencies
+└── README.md                      # This file
 ```
 
-## Usage
+## Pipeline
 
-### 1. Verify data loading
+### Step 1 — Verify data loading
 
 ```bash
 python -m src.data_loading
 ```
 
-### 2. Run baseline models (handcrafted features)
+### Step 2 — Baseline models (handcrafted features only)
 
 ```bash
 python -m src.models.baseline
 ```
 
-### 3. Extract ESM-2 embeddings (GPU recommended)
+### Step 3 — Extract ESM-2 embeddings (GPU recommended)
 
 ```bash
-python -m src.features.embeddings
+# 650M model (best quality, ~2.5 h on RTX 3060)
+python -m src.features.embeddings --model 650M
+
+# 8M model (fast, ~15 min)
+python -m src.features.embeddings --model 8M
 ```
 
-### 4. Run advanced models + ablation study
+### Step 4 — Advanced models + ablation study
 
 ```bash
 python -m src.models.advanced
 ```
 
-### 5. Fine-tune ESM-2 end-to-end (GPU required, ~5 h on RTX 5090)
+### Step 5 — Fine-tune ESM-2 8M end-to-end (GPU required)
 
 ```bash
 python -m src.models.finetune
 ```
 
-### 6. Evaluate soft-vote ensemble (fine-tuned 8M + XGBoost 650M)
+### Step 6 — Ensemble evaluation
 
 ```bash
-# Requires finetune_results.json and best_model.joblib to be present.
-# Re-runs XGBoost CV once to generate OOF probabilities (cached for re-runs).
 python -m src.models.ensemble
 ```
 
-### 7. Run interpretability analysis
+### Step 7 — Interpretability analysis
 
 ```bash
 python -m src.interpretability
 ```
 
-### 8. Run confidence calibration
+### Step 8 — Confidence calibration
 
 ```bash
 python -m src.confidence
 ```
 
-### 9. Generate blind challenge predictions
+### Blind challenge predictions
 
 ```bash
-# Using best single model (XGBoost + SMOTE on ESM-2 650M + Physicochemical)
-python -m src.predict_blind --fasta <path_to_blind_test.fasta> \
-    --model outputs/models/best_model.joblib \
-    --output outputs/predictions/blind_predictions.txt
-
-# Using ensemble (fine-tuned ESM-2 8M + XGBoost 650M soft vote) -- recommended
-python -m src.predict_blind --fasta <path_to_blind_test.fasta> \
+# Recommended: ensemble (fine-tuned 8M + XGBoost 650M)
+python -m src.predict_blind --fasta <test.fasta> \
     --model outputs/models/best_model.joblib \
     --model-finetune outputs/models/finetune_artifact.joblib \
-    --output outputs/predictions/blind_predictions_ensemble.txt
+    --output outputs/predictions/blind_predictions.txt
 
-# Using fine-tuned ESM-2 8M model only
-python -m src.predict_blind --fasta <path_to_blind_test.fasta> \
-    --model outputs/models/finetune_artifact.joblib \
-    --output outputs/predictions/blind_predictions_finetune.txt
+# Alternative: best single model only
+python -m src.predict_blind --fasta <test.fasta> \
+    --model outputs/models/best_model.joblib \
+    --output outputs/predictions/blind_predictions.txt
 ```
 
-## Outputs
+Output format (one line per sequence, no header):
+```
+SEQ01 1 Confidence High
+SEQ02 0 Confidence Medium
+```
 
-- `outputs/models/` — Saved model artefacts
-- `outputs/figures/` — Confusion matrices, metrics comparison, feature importance
-- `outputs/predictions/` — Blind challenge predictions
-- `outputs/features/` — Cached feature matrices
+## Results
 
-## Results Summary
-
-All experiments use **stratified 5-fold cross-validation**. Best model selected by Macro F1.
+All results from **stratified 5-fold cross-validation** (seed = 42). Best model chosen by Macro F1.
 
 ### Model Comparison
 
-Features for XGBoost / LightGBM: **ESM-2 650M** (`esm2_t33_650M_UR50D`, 1280-d) + physicochemical (8-d) = 1288-d total.
-
-| Model | Features | Accuracy | Macro F1 | Balanced Acc. | MCC |
-|-------|----------|----------|----------|---------------|-----|
+| Model | Features | Accuracy | Macro F1 | Bal. Acc. | MCC |
+|-------|----------|----------|----------|-----------|-----|
 | Logistic Regression | Handcrafted (429-d) | 0.457 | 0.191 | 0.300 | 0.171 |
 | Random Forest | Handcrafted (429-d) | 0.816 | 0.141 | 0.149 | 0.093 |
-| XGBoost | ESM-2 650M + Physico (1288-d) | 0.886 | 0.575 | 0.516 | 0.621 |
-| LightGBM | ESM-2 650M + Physico (1288-d) | 0.879 | 0.515 | 0.467 | 0.605 |
-| LightGBM + SMOTE | ESM-2 650M + Physico (1288-d) | 0.880 | 0.576 | 0.535 | 0.620 |
-| ESM-2 8M Fine-tune (end-to-end) | Raw sequences | 0.823 | 0.509 | 0.570 | 0.553 |
-| **XGBoost + SMOTE** | **ESM-2 650M + Physico (1288-d)** | **0.886** | **0.595** | **0.552** | **0.631** |
-| Ensemble (Fine-tuned 8M + XGBoost 650M) | Soft vote | — | — | — | — |
+| XGBoost | ESM-2 650M + Physico (1 288-d) | 0.886 | 0.575 | 0.516 | 0.621 |
+| LightGBM + SMOTE | ESM-2 650M + Physico (1 288-d) | 0.880 | 0.576 | 0.535 | 0.620 |
+| ESM-2 8M Fine-tune | Raw sequences | 0.823 | 0.509 | 0.570 | 0.553 |
+| XGBoost + SMOTE | ESM-2 650M + Physico (1 288-d) | 0.886 | **0.595** | 0.552 | 0.631 |
+| **Ensemble** | **Soft vote (8M FT + XGB 650M)** | **0.890** | **0.625** | **0.604** | **0.659** |
 
-> **Note:** Run `python -m src.models.ensemble` to populate the ensemble metrics after fine-tuning is complete.
+### Feature Ablation (XGBoost, balanced weights)
 
-### Feature Ablation Study (XGBoost with balanced sample weights, ESM-2 650M)
-
-| Feature Set | Accuracy | Macro F1 | Balanced Acc. | MCC |
-|-------------|----------|----------|---------------|-----|
+| Feature Set | Accuracy | Macro F1 | Bal. Acc. | MCC |
+|-------------|----------|----------|-----------|-----|
 | Handcrafted only (429-d) | 0.817 | 0.206 | 0.191 | 0.236 |
-| ESM-2 + Handcrafted (1709-d) | 0.884 | 0.552 | 0.496 | 0.609 |
-| ESM-2 only (1280-d) | 0.884 | 0.562 | 0.506 | 0.615 |
-| **ESM-2 + Physicochemical (1288-d)** | **0.886** | **0.575** | **0.516** | **0.621** |
+| ESM-2 only (1 280-d) | 0.884 | 0.562 | 0.506 | 0.615 |
+| ESM-2 + Handcrafted (1 709-d) | 0.884 | 0.552 | 0.496 | 0.609 |
+| **ESM-2 + Physicochemical (1 288-d)** | **0.886** | **0.575** | **0.516** | **0.621** |
 
-### Key Findings
-
-- **ESM-2 650M embeddings dominate** handcrafted features (Macro F1: 0.56 vs 0.21)
-- **SMOTE on training fold** improves XGBoost minority-class recall (+2% Macro F1) at no accuracy cost
-- **ESM-2 + Physicochemical** is the strongest feature combination (Macro F1=0.595, MCC=0.631)
-- Adding all handcrafted features to ESM-2 **hurts** performance (noise from 429 extra dimensions)
-- **End-to-end fine-tuning** (ESM-2 8M) achieves F1=0.509 — outperformed by XGBoost on frozen 650M embeddings, likely due to model size (8M vs 650M parameters)
-- **Best single model**: XGBoost + SMOTE on ESM-2 650M + Physicochemical features
-- **Ensemble** (soft-vote of fine-tuned 8M + XGBoost 650M) combines complementary strengths of both approaches; run `python -m src.models.ensemble` to evaluate
-- Per-class weaknesses: Lyase (F1=0.24), Isomerase (F1=0.29) — smallest minority classes
-
-### Confidence Calibration (best model: XGBoost + SMOTE)
+### Confidence Calibration
 
 | Level | Count | Accuracy | Mean Max Prob |
 |-------|-------|----------|---------------|
-| High (p ≥ 0.80) | 30,448 (76.6%) | 95.1% | 0.959 |
-| Medium (0.50 ≤ p < 0.80) | 6,658 (16.7%) | 66.2% | 0.663 |
-| Low (p < 0.50) | 2,658 (6.7%) | 41.2% | 0.411 |
+| High (p ≥ 0.80) | 30 448 (76.6 %) | 95.1 % | 0.959 |
+| Medium (0.50 ≤ p < 0.80) | 6 658 (16.7 %) | 66.2 % | 0.663 |
+| Low (p < 0.50) | 2 658 (6.7 %) | 41.2 % | 0.411 |
 
-## Class Distribution
+### Class Distribution
 
-| Class | Label          | Count  |
-|-------|----------------|--------|
-| 0     | Not an enzyme  | 32,410 |
-| 1     | Oxidoreductase | 1,184  |
-| 2     | Transferase    | 2,769  |
-| 3     | Hydrolase      | 2,108  |
-| 4     | Lyase          | 600    |
-| 5     | Isomerase      | 411    |
-| 6     | Ligase         | 282    |
+| Class | Label | Count |
+|-------|-------|-------|
+| 0 | Not an enzyme | 32 410 |
+| 1 | Oxidoreductase | 1 184 |
+| 2 | Transferase | 2 769 |
+| 3 | Hydrolase | 2 108 |
+| 4 | Lyase | 600 |
+| 5 | Isomerase | 411 |
+| 6 | Ligase | 282 |
+
+## Key Findings
+
+1. **ESM-2 650M embeddings dominate** handcrafted features (Macro F1: 0.56 vs 0.21).
+2. **SMOTE on training folds** boosts minority-class recall (+2 % Macro F1) at no accuracy cost.
+3. **ESM-2 + Physicochemical (8-d)** is the strongest feature pairing; adding full handcrafted features introduces noise.
+4. **Ensemble** of fine-tuned ESM-2 8M and XGBoost on frozen 650M embeddings achieves the best overall Macro F1 of **0.625**.
+5. **Minority classes remain challenging**: Lyase (F1 = 0.24) and Isomerase (F1 = 0.29) suffer from extreme class imbalance.
+6. **High-confidence predictions are reliable**: 95.1 % accuracy when p ≥ 0.80.
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) | Exhaustive developer onboarding, architecture guide, and extension reference |
+| [`REPORT.md`](REPORT.md) | 2 500-word academic submission report for COMP0082 |
