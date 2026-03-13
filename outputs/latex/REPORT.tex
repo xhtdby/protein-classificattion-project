@@ -330,6 +330,7 @@ SHAP values across all seven classes.
 \begin{table}[H]
 \centering
 \caption{Per-class metrics for XGBoost + SMOTE (OOF).}
+\label{tab:per-class-metrics}
 \begin{tabular}{lccc}
 \toprule
 Class & Precision & Recall & F1 \\
@@ -345,7 +346,7 @@ Ligase & 0.603 & 0.426 & 0.499 \\
 \end{tabular}
 \end{table}
 
-Per-class precision, recall, and F1 (Table~4) reveal that the model is conservative on minority
+Per-class precision, recall, and F1 (Table~\ref{tab:per-class-metrics}) reveal that the model is conservative on minority
 classes: Isomerase precision (0.554) far exceeds its recall (0.200), indicating the model
 correctly identifies some Isomerases but abstains from predicting this class in borderline cases.
 
