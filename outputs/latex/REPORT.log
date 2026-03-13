@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.4.10)  13 MAR 2026 02:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.4.10)  13 MAR 2026 03:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -527,106 +527,108 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <6> on input line 28.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 49.
-<../figures/class_distribution.png, id=83, 714.5094pt x 424.4658pt>
+(Font)              <10.95> on input line 56.
+<../figures/class_distribution.png, id=87, 714.5094pt x 424.4658pt>
 File: ../figures/class_distribution.png Graphic file (type png)
 <use ../figures/class_distribution.png>
-Package pdftex.def Info: ../figures/class_distribution.png  used on input line 66.
+Package pdftex.def Info: ../figures/class_distribution.png  used on input line 73.
 (pdftex.def)             Requested size: 353.31439pt x 209.89424pt.
  [1
 
 {C:/Users/vishu/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 84.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 97.
  (C:\Users\vishu\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [2 <../figures/class_distribution.png>]
-Overfull \hbox (1.46204pt too wide) in paragraph at lines 107--110
+Overfull \hbox (58.10081pt too wide) in paragraph at lines 119--125
+\T1/lmr/bx/n/10.95 Baselines: \T1/lmr/m/n/10.95 Lo-gis-tic Re-gres-sion (\T1/lmtt/m/n/10.95 class_weight='balanced'\T1/lmr/m/n/10.95 , multi-no-mial, L-BFGS solver, \T1/lmtt/m/n/10.95 max_iter=1000\T1/lmr/m/n/10.95 )
+ []
+
+
+Overfull \hbox (0.34305pt too wide) in paragraph at lines 126--137
+\T1/lmr/m/n/10.95 re-spond to the best con-fig-u-ra-tion found by the op-tional \T1/lmtt/m/n/10.95 --tune \T1/lmr/m/n/10.95 path in \T1/lmtt/m/n/10.95 src/models/advanced.py
+ []
+
+
+Overfull \hbox (10.1855pt too wide) in paragraph at lines 126--137
+\T1/lmr/m/n/10.95 (whose un-tuned de-faults are \T1/lmtt/m/n/10.95 n_estimators=500\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 learning_rate=0.05\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 colsample_bytree=0.8\T1/lmr/m/n/10.95 );
+ []
+
+
+Overfull \hbox (1.46204pt too wide) in paragraph at lines 138--146
 []\T1/lmr/bx/n/10.95 Fine-tuning: \T1/lmr/m/n/10.95 End-to-end ESM-2 8M fine-tuning with clas-si-fi-ca-tion head $[]\OT1/lmr/m/n/10.95 (320\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 128) \OMS/lmsy/m/n/10.95 !
  []
 
-
-Overfull \hbox (29.00362pt too wide) in paragraph at lines 111--113
-[]\T1/lmr/bx/n/10.95 Ensemble: \T1/lmr/m/n/10.95 Soft-vote blend of out-of-fold prob-a-bil-i-ties from fine-tuned 8M and XG-Boost+SMOTE
- []
-
-<../figures/model_comparison.png, id=110, 1003.1076pt x 496.7358pt>
+[3{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}]
+<../figures/model_comparison.png, id=123, 1003.1076pt x 496.7358pt>
 File: ../figures/model_comparison.png Graphic file (type png)
 <use ../figures/model_comparison.png>
-Package pdftex.def Info: ../figures/model_comparison.png  used on input line 143.
+Package pdftex.def Info: ../figures/model_comparison.png  used on input line 195.
 (pdftex.def)             Requested size: 398.61395pt x 197.3871pt.
-[3{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}]
-<../figures/ablation_results.png, id=119, 859.5312pt x 424.9476pt>
+ [4 <../figures/model_comparison.png>]
+<../figures/ablation_results.png, id=131, 859.5312pt x 424.9476pt>
 File: ../figures/ablation_results.png Graphic file (type png)
 <use ../figures/ablation_results.png>
-Package pdftex.def Info: ../figures/ablation_results.png  used on input line 165.
+Package pdftex.def Info: ../figures/ablation_results.png  used on input line 224.
 (pdftex.def)             Requested size: 326.13744pt x 161.24184pt.
-<../figures/cm_xgboost_smote.png, id=120, 669.702pt x 569.4876pt>
+<../figures/cm_xgboost_smote.png, id=132, 669.702pt x 569.4876pt>
 File: ../figures/cm_xgboost_smote.png Graphic file (type png)
 <use ../figures/cm_xgboost_smote.png>
-Package pdftex.def Info: ../figures/cm_xgboost_smote.png  used on input line 174.
+Package pdftex.def Info: ../figures/cm_xgboost_smote.png  used on input line 233.
 (pdftex.def)             Requested size: 217.42265pt x 184.8901pt.
-<../figures/cm_ensemble.png, id=121, 669.702pt x 569.4876pt>
+<../figures/cm_ensemble.png, id=133, 669.702pt x 569.4876pt>
 File: ../figures/cm_ensemble.png Graphic file (type png)
 <use ../figures/cm_ensemble.png>
-Package pdftex.def Info: ../figures/cm_ensemble.png  used on input line 180.
+Package pdftex.def Info: ../figures/cm_ensemble.png  used on input line 239.
 (pdftex.def)             Requested size: 217.42265pt x 184.8901pt.
- [4 <../figures/model_comparison.png> <../figures/ablation_results.png>]
-<../figures/reliability_diagram.png, id=131, 570.4512pt x 713.5458pt>
+ [5 <../figures/ablation_results.png>]
+<../figures/reliability_diagram.png, id=141, 570.4512pt x 713.5458pt>
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
-Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line 207.
+Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line 274.
 (pdftex.def)             Requested size: 326.13744pt x 407.95566pt.
- [5 <../figures/cm_xgboost_smote.png> <../figures/cm_ensemble.png>]
-<../figures/feature_importance.png, id=140, 715.473pt x 569.0058pt>
+ [6 <../figures/cm_xgboost_smote.png> <../figures/cm_ensemble.png>]
+<../figures/feature_importance.png, id=150, 715.473pt x 569.0058pt>
 File: ../figures/feature_importance.png Graphic file (type png)
 <use ../figures/feature_importance.png>
-Package pdftex.def Info: ../figures/feature_importance.png  used on input line 223.
+Package pdftex.def Info: ../figures/feature_importance.png  used on input line 302.
 (pdftex.def)             Requested size: 217.42265pt x 172.90836pt.
-<../figures/shap_importance.png, id=141, 715.473pt x 569.0058pt>
+<../figures/shap_importance.png, id=151, 715.473pt x 569.0058pt>
 File: ../figures/shap_importance.png Graphic file (type png)
 <use ../figures/shap_importance.png>
-Package pdftex.def Info: ../figures/shap_importance.png  used on input line 229.
+Package pdftex.def Info: ../figures/shap_importance.png  used on input line 308.
 (pdftex.def)             Requested size: 217.42265pt x 172.90836pt.
- [6 <../figures/reliability_diagram.png>]
-<../figures/per_class_metrics.png, id=148, 859.5312pt x 424.9476pt>
+ [7 <../figures/reliability_diagram.png>]
+<../figures/per_class_metrics.png, id=159, 859.5312pt x 424.9476pt>
 File: ../figures/per_class_metrics.png Graphic file (type png)
 <use ../figures/per_class_metrics.png>
-Package pdftex.def Info: ../figures/per_class_metrics.png  used on input line 239.
+Package pdftex.def Info: ../figures/per_class_metrics.png  used on input line 318.
 (pdftex.def)             Requested size: 217.42265pt x 107.48807pt.
-<../figures/high_confidence_errors.png, id=149, 1004.553pt x 352.1958pt>
+<../figures/high_confidence_errors.png, id=160, 1004.553pt x 352.1958pt>
 File: ../figures/high_confidence_errors.png Graphic file (type png)
 <use ../figures/high_confidence_errors.png>
-Package pdftex.def Info: ../figures/high_confidence_errors.png  used on input line 245.
+Package pdftex.def Info: ../figures/high_confidence_errors.png  used on input line 324.
 (pdftex.def)             Requested size: 217.42265pt x 76.22578pt.
- [7 <../figures/feature_importance.png> <../figures/shap_importance.png> <../figures/per_class_metrics.png> <../figures/high_confidence_errors.png>]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 285.
- (C:\Users\vishu\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
-File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-Overfull \hbox (8.05115pt too wide) in paragraph at lines 289--291
-[]\T1/lmr/m/n/10.95 Threshold vec-tor ap-prox-i-mately unity: $\OT1/lmr/m/n/10.95 [1\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 0000\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 0\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 9999\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 0\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 9999\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 0\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 9999\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 1\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 0000\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 0\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 9999\OML/lmm/m/it/10.95 ; \OT1/lmr/m/n/10.95 0\OML/lmm/m/it/10.95 :\OT1/lmr/m/n/10.95 9999]$ 
- []
-
-[8{C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}] [9] (REPORT.aux)
+ [8 <../figures/feature_importance.png> <../figures/shap_importance.png> <../figures/per_class_metrics.png> <../figures/high_confidence_errors.png>] [9] [10] [11] (REPORT.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
 Package rerunfilecheck Info: File `REPORT.out' has not changed.
-(rerunfilecheck)             Checksum: 5B78E94108B9CF999C364AAD2BEA5C2D;2693.
+(rerunfilecheck)             Checksum: 5F2424103A2142F3C4301BFF37DDF2E1;2728.
  ) 
 Here is how much of TeX's memory you used:
- 16595 strings out of 474486
- 328121 string characters out of 5743755
- 1935542 words of memory out of 5000000
- 38638 multiletter control sequences out of 15000+600000
- 602699 words of font info for 62 fonts, out of 8000000 for 9000
+ 16562 strings out of 474486
+ 327190 string characters out of 5743755
+ 1937542 words of memory out of 5000000
+ 38607 multiletter control sequences out of 15000+600000
+ 602334 words of font info for 61 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,9n,79p,346b,1181s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi8.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb>
-Output written on REPORT.pdf (9 pages, 891776 bytes).
+ 75i,9n,79p,362b,1183s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy8.pfb><C:/Users/vishu/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb>
+Output written on REPORT.pdf (11 pages, 927475 bytes).
 PDF statistics:
- 236 PDF objects out of 1000 (max. 8388607)
- 47 named destinations out of 1000 (max. 500000)
- 211 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 251 PDF objects out of 1000 (max. 8388607)
+ 50 named destinations out of 1000 (max. 500000)
+ 219 words of extra memory for PDF output out of 10000 (max. 10000000)
 

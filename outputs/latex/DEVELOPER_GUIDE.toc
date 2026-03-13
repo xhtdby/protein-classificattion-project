@@ -16,14 +16,40 @@
 \contentsline {subsection}{\numberline {6.8}models/finetune.py}{6}{subsection.6.8}%
 \contentsline {subsection}{\numberline {6.9}models/ensemble.py}{6}{subsection.6.9}%
 \contentsline {subsection}{\numberline {6.10}predict\_blind.py}{6}{subsection.6.10}%
-\contentsline {section}{\numberline {7}Data-Leakage Prevention}{6}{section.7}%
-\contentsline {section}{\numberline {8}Reproducibility}{6}{section.8}%
-\contentsline {section}{\numberline {9}Results Summary (Generated Artifacts)}{7}{section.9}%
-\contentsline {section}{\numberline {10}Figures and Outputs}{7}{section.10}%
-\contentsline {section}{\numberline {11}Troubleshooting}{8}{section.11}%
-\contentsline {subsection}{\numberline {11.1}CUDA Out of Memory}{8}{subsection.11.1}%
-\contentsline {subsection}{\numberline {11.2}SMOTE Failure}{8}{subsection.11.2}%
-\contentsline {subsection}{\numberline {11.3}Dimension Mismatch in Blind Prediction}{8}{subsection.11.3}%
-\contentsline {section}{\numberline {12}Appendix: Output File Reference}{8}{section.12}%
-\contentsline {subsection}{\numberline {12.1}JSON Files}{8}{subsection.12.1}%
-\contentsline {subsection}{\numberline {12.2}Model and Cache Artifacts}{9}{subsection.12.2}%
+\contentsline {section}{\numberline {7}Feature Engineering}{6}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Handcrafted Features (429-d)}{6}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}ESM-2 Embeddings}{7}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Feature Combination Results}{7}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Model Training}{7}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Cross-Validation Protocol}{7}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Class Imbalance Strategies}{7}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Metrics}{8}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Model Progression}{8}{subsection.8.4}%
+\contentsline {section}{\numberline {9}Evaluation Framework}{8}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Metrics Computation}{8}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Confusion Matrices}{8}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Result Persistence}{8}{subsection.9.3}%
+\contentsline {section}{\numberline {10}Interpretability}{8}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Feature Importance}{8}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}SHAP Analysis}{9}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Per-Class Error Analysis}{9}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}High-Confidence Error Analysis}{9}{subsection.10.4}%
+\contentsline {section}{\numberline {11}Confidence Scoring}{9}{section.11}%
+\contentsline {section}{\numberline {12}Blind Prediction Pipeline}{10}{section.12}%
+\contentsline {section}{\numberline {13}Data-Leakage Prevention}{10}{section.13}%
+\contentsline {section}{\numberline {14}Reproducibility}{10}{section.14}%
+\contentsline {section}{\numberline {15}Results Summary (Generated Artifacts)}{11}{section.15}%
+\contentsline {section}{\numberline {16}Figures and Outputs}{11}{section.16}%
+\contentsline {section}{\numberline {17}Extension Guide}{12}{section.17}%
+\contentsline {subsection}{\numberline {17.1}Adding a New Feature Extractor}{12}{subsection.17.1}%
+\contentsline {subsection}{\numberline {17.2}Adding a New Model}{12}{subsection.17.2}%
+\contentsline {subsection}{\numberline {17.3}Upgrading the ESM-2 Model}{12}{subsection.17.3}%
+\contentsline {subsection}{\numberline {17.4}Potential Improvements}{13}{subsection.17.4}%
+\contentsline {section}{\numberline {18}Troubleshooting}{13}{section.18}%
+\contentsline {subsection}{\numberline {18.1}CUDA Out of Memory}{13}{subsection.18.1}%
+\contentsline {subsection}{\numberline {18.2}ESM-2 Model Download Fails}{13}{subsection.18.2}%
+\contentsline {subsection}{\numberline {18.3}SMOTE Failure}{13}{subsection.18.3}%
+\contentsline {subsection}{\numberline {18.4}Dimension Mismatch in Blind Prediction}{13}{subsection.18.4}%
+\contentsline {section}{\numberline {19}Appendix: Output File Reference}{14}{section.19}%
+\contentsline {subsection}{\numberline {19.1}JSON Result Files}{14}{subsection.19.1}%
+\contentsline {subsection}{\numberline {19.2}Model and Cache Artifacts}{14}{subsection.19.2}%
