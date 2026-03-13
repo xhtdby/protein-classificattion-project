@@ -127,6 +127,11 @@ curse of dimensionality from the 400-d dipeptide features.
 with and without SMOTE.
 Hyperparameters for XGBoost were: \texttt{max\_depth=6}, \texttt{n\_estimators=800},
 \texttt{learning\_rate=0.1}, \texttt{subsample=0.8}, \texttt{colsample\_bytree=0.9}.
+These correspond to the best configuration found by the optional \texttt{--tune} path in
+\texttt{src/models/advanced.py} (whose untuned defaults are \texttt{n\_estimators=500},
+\texttt{learning\_rate=0.05}, \texttt{colsample\_bytree=0.8}); to reproduce the reported
+XGBoost results, the training script should be run with the \texttt{--tune} option as
+described in the project README.
 Class imbalance was addressed through balanced sample weights and, separately, through SMOTE
 on the training fold (five nearest neighbours, default ratio).
 
