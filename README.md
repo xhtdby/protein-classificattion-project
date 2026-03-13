@@ -40,8 +40,8 @@ protein-classification/
 │   ├── models/                    # Saved model artefacts (.joblib, .pt)
 │   ├── figures/                   # 19 publication-quality PNG plots
 │   └── predictions/               # Blind challenge output files
-├── DEVELOPER_GUIDE.md             # Exhaustive developer documentation
-├── REPORT.md                      # 2 500-word academic submission report
+├── outputs/latex/DEVELOPER_GUIDE.tex  # Exhaustive developer documentation (LaTeX)
+├── outputs/latex/REPORT.tex           # 2 500-word academic submission report (LaTeX)
 ├── requirements.txt               # Pinned Python dependencies
 └── README.md                      # This file
 ```
@@ -179,5 +179,5 @@ All results from **stratified 5-fold cross-validation** (seed = 42). Best model 
 
 | Document | Purpose |
 |----------|---------|
-| [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) | Exhaustive developer onboarding, architecture guide, and extension reference |
-| [`REPORT.md`](REPORT.md) | 2 500-word academic submission report for COMP0082 |
+| [`outputs/latex/DEVELOPER_GUIDE.tex`](outputs/latex/DEVELOPER_GUIDE.tex) | Exhaustive developer onboarding, architecture guide, and extension reference |
+| [`outputs/latex/REPORT.tex`](outputs/latex/REPORT.tex) | 2 500-word academic submission report for COMP0082 |
