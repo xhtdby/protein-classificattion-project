@@ -24,11 +24,12 @@ src/
 ├── models/
 │   ├── baseline.py          # Logistic Regression, Random Forest
 │   ├── advanced.py          # XGBoost, LightGBM, feature ablation
-│   └── finetune.py          # End-to-end ESM-2 8M fine-tuning
+│   ├── finetune.py          # End-to-end ESM-2 8M fine-tuning
+│   └── ensemble.py          # Soft-vote ensemble: fine-tuned 8M + XGBoost 650M
 ├── training.py              # Cross-validation loop (leak-safe)
 ├── evaluation.py            # Metrics, confusion matrix, comparison plots
 ├── interpretability.py      # Feature importance, ablation, error analysis
-├── confidence.py            # Probability → High/Medium/Low
+├── confidence.py            # Probability -> High/Medium/Low
 └── predict_blind.py         # Blind challenge prediction pipeline
 ```
 
@@ -64,27 +65,41 @@ python -m src.models.advanced
 python -m src.models.finetune
 ```
 
-### 6. Run interpretability analysis
+### 6. Evaluate soft-vote ensemble (fine-tuned 8M + XGBoost 650M)
+
+```bash
+# Requires finetune_results.json and best_model.joblib to be present.
+# Re-runs XGBoost CV once to generate OOF probabilities (cached for re-runs).
+python -m src.models.ensemble
+```
+
+### 7. Run interpretability analysis
 
 ```bash
 python -m src.interpretability
 ```
 
-### 7. Run confidence calibration
+### 8. Run confidence calibration
 
 ```bash
 python -m src.confidence
 ```
 
-### 8. Generate blind challenge predictions
+### 9. Generate blind challenge predictions
 
 ```bash
-# Using best model (XGBoost + SMOTE on ESM-2 650M + Physicochemical)
+# Using best single model (XGBoost + SMOTE on ESM-2 650M + Physicochemical)
 python -m src.predict_blind --fasta <path_to_blind_test.fasta> \
     --model outputs/models/best_model.joblib \
     --output outputs/predictions/blind_predictions.txt
 
-# Using fine-tuned ESM-2 8M model
+# Using ensemble (fine-tuned ESM-2 8M + XGBoost 650M soft vote) -- recommended
+python -m src.predict_blind --fasta <path_to_blind_test.fasta> \
+    --model outputs/models/best_model.joblib \
+    --model-finetune outputs/models/finetune_artifact.joblib \
+    --output outputs/predictions/blind_predictions_ensemble.txt
+
+# Using fine-tuned ESM-2 8M model only
 python -m src.predict_blind --fasta <path_to_blind_test.fasta> \
     --model outputs/models/finetune_artifact.joblib \
     --output outputs/predictions/blind_predictions_finetune.txt
@@ -114,6 +129,9 @@ Features for XGBoost / LightGBM: **ESM-2 650M** (`esm2_t33_650M_UR50D`, 1280-d) 
 | LightGBM + SMOTE | ESM-2 650M + Physico (1288-d) | 0.880 | 0.576 | 0.535 | 0.620 |
 | ESM-2 8M Fine-tune (end-to-end) | Raw sequences | 0.823 | 0.509 | 0.570 | 0.553 |
 | **XGBoost + SMOTE** | **ESM-2 650M + Physico (1288-d)** | **0.886** | **0.595** | **0.552** | **0.631** |
+| Ensemble (Fine-tuned 8M + XGBoost 650M) | Soft vote | — | — | — | — |
+
+> **Note:** Run `python -m src.models.ensemble` to populate the ensemble metrics after fine-tuning is complete.
 
 ### Feature Ablation Study (XGBoost with balanced sample weights, ESM-2 650M)
 
@@ -131,7 +149,8 @@ Features for XGBoost / LightGBM: **ESM-2 650M** (`esm2_t33_650M_UR50D`, 1280-d) 
 - **ESM-2 + Physicochemical** is the strongest feature combination (Macro F1=0.595, MCC=0.631)
 - Adding all handcrafted features to ESM-2 **hurts** performance (noise from 429 extra dimensions)
 - **End-to-end fine-tuning** (ESM-2 8M) achieves F1=0.509 — outperformed by XGBoost on frozen 650M embeddings, likely due to model size (8M vs 650M parameters)
-- **Best model**: XGBoost + SMOTE on ESM-2 650M + Physicochemical features
+- **Best single model**: XGBoost + SMOTE on ESM-2 650M + Physicochemical features
+- **Ensemble** (soft-vote of fine-tuned 8M + XGBoost 650M) combines complementary strengths of both approaches; run `python -m src.models.ensemble` to evaluate
 - Per-class weaknesses: Lyase (F1=0.24), Isomerase (F1=0.29) — smallest minority classes
 
 ### Confidence Calibration (best model: XGBoost + SMOTE)

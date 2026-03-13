@@ -36,7 +36,7 @@ def make_result(name: str, acc_m: float, acc_s: float, f1_m: float, f1_s: float,
 
 
 def _load_all_results(outputs_dir: Path) -> tuple[list[dict], list[dict]]:
-    """Load baseline + advanced + finetune results from JSON, building plot-ready dicts."""
+    """Load baseline + advanced + finetune + ensemble results from JSON."""
     all_models = []
     ablation = []
 
@@ -66,6 +66,15 @@ def _load_all_results(outputs_dir: Path) -> tuple[list[dict], list[dict]]:
             "summary": ft["summary"],
         })
         print(f"  Loaded finetune results from JSON")
+
+    # Ensemble results
+    ens = _load_json(outputs_dir / "ensemble_results.json")
+    if ens and "summary" in ens:
+        all_models.append({
+            "model_name": ens["model_name"],
+            "summary": ens["summary"],
+        })
+        print(f"  Loaded ensemble results from JSON")
 
     if not all_models:
         print("  WARNING: No JSON results found -- run baseline.py and advanced.py first")
