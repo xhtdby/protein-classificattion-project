@@ -155,10 +155,6 @@ class ESM2Classifier650M(nn.Module):
     ) -> torch.Tensor:
         """Run ESM-2 forward pass, optionally with gradient checkpointing."""
         if self.use_grad_ckpt and self.training:
-            from torch.utils.checkpoint import checkpoint_sequential
-            # ESM-2 layers are an nn.ModuleList; wrap in a Sequential for ckpt.
-            seq_mod = nn.Sequential(*self.esm.layers)
-
             x = self.esm.embed_tokens(tokens)
             # Apply positional embeddings if present (ESM-2 uses rotary, but the
             # embed_positions call is a no-op for rotary models).
@@ -172,13 +168,8 @@ class ESM2Classifier650M(nn.Module):
             if not padding_mask.any():
                 padding_mask = None
 
-            # Wrap layers so checkpoint_sequential can split them
-            def _layer_fn(module, x_pad):
-                x, pad = x_pad
-                x, _ = module(x, self_attn_padding_mask=pad, need_head_weights=False)
-                return x, pad
-
-            # Gradient checkpointing via manual per-layer checkpoints
+            # Per-layer gradient checkpointing: trades ~50% activation memory
+            # for ~20% extra compute.
             x_cur = x
             for layer in self.esm.layers:
                 def make_ckpt(lyr):
@@ -272,31 +263,70 @@ def build_llrd_optimizer(
 class FinetunePredictor650M:
     """Wraps a saved ESM2Classifier650M state-dict for sklearn-style predict_proba.
 
-    Weights are loaded lazily on the first call so the object can be
-    pickled/joblibed without serialising the entire model graph.
+    The backbone and head are loaded lazily on the first call to
+    ``predict_proba`` and then **cached** on the instance so that repeated
+    calls (e.g. across folds or in ensemble pipelines) avoid reloading the
+    ~2.5 GB weights and re-allocating GPU memory.
+
+    Parameters
+    ----------
+    model_path : Path or str
+        Path to the ``.pt`` file saved by ``retrain_full_650m``.
+    max_len : int
+        Maximum sequence length used when *training* this model.  Persisted
+        in the joblib artefact so inference always matches training truncation.
     """
 
-    def __init__(self, model_path: Path | str):
+    def __init__(self, model_path: Path | str, max_len: int = MAX_LEN):
         self.model_path = Path(model_path)
+        self.max_len = max_len
+        # Lazily-initialised cache — not serialised by joblib/pickle.
+        self._model: ESM2Classifier650M | None = None
+        self._batch_converter = None
+        self._device: torch.device | None = None
+
+    # ------------------------------------------------------------------
+    # Pickle/joblib compatibility: strip the in-process GPU cache so the
+    # artefact file never contains serialised PyTorch tensors.
+    # ------------------------------------------------------------------
+    def __getstate__(self) -> dict:
+        state = self.__dict__.copy()
+        state["_model"] = None
+        state["_batch_converter"] = None
+        state["_device"] = None
+        return state
+
+    def _ensure_loaded(self) -> None:
+        """Load model and alphabet on first call; subsequent calls are no-ops."""
+        if self._model is not None:
+            return
+        import esm as esm_lib
+
+        device = (
+            torch.device("cuda")
+            if torch.cuda.is_available()
+            else torch.device("cpu")
+        )
+        esm_model, alphabet = esm_lib.pretrained.esm2_t33_650M_UR50D()
+        model = ESM2Classifier650M(esm_model).to(device)
+        state = torch.load(self.model_path, map_location=device, weights_only=True)
+        model.load_state_dict(state)
+        model.eval()
+
+        self._model = model
+        self._batch_converter = alphabet.get_batch_converter()
+        self._device = device
 
     def predict_proba(
         self,
         sequences: list[str],
         batch_size: int = 8,
     ) -> np.ndarray:
-        device = (
-            torch.device("cuda")
-            if torch.cuda.is_available()
-            else torch.device("cpu")
-        )
-        import esm as esm_lib
-
-        esm_model, alphabet = esm_lib.pretrained.esm2_t33_650M_UR50D()
-        model = ESM2Classifier650M(esm_model).to(device)
-        state = torch.load(self.model_path, map_location=device, weights_only=True)
-        model.load_state_dict(state)
-        model.eval()
-        batch_converter = alphabet.get_batch_converter()
+        """Return softmax probability matrix, shape ``(N, 7)``."""
+        self._ensure_loaded()
+        model = self._model
+        device = self._device
+        max_len = self.max_len
 
         all_proba: list[np.ndarray] = []
         amp_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
@@ -304,10 +334,10 @@ class FinetunePredictor650M:
         with torch.no_grad():
             for start in range(0, len(sequences), batch_size):
                 batch_seqs = sequences[start : start + batch_size]
-                data = [(f"s{i}", s[:MAX_LEN]) for i, s in enumerate(batch_seqs)]
-                _, _, tokens = batch_converter(data)
+                data = [(f"s{i}", s[:max_len]) for i, s in enumerate(batch_seqs)]
+                _, _, tokens = self._batch_converter(data)
                 seq_lengths = torch.tensor(
-                    [len(s[:MAX_LEN]) for s in batch_seqs], dtype=torch.long
+                    [len(s[:max_len]) for s in batch_seqs], dtype=torch.long
                 )
                 tokens = tokens.to(device)
                 seq_lengths = seq_lengths.to(device)
@@ -322,9 +352,6 @@ class FinetunePredictor650M:
                 proba = torch.softmax(logits.float(), dim=-1).cpu().numpy()
                 all_proba.append(proba)
 
-        del model, esm_model
-        if device.type == "cuda":
-            torch.cuda.empty_cache()
         return np.vstack(all_proba)
 
 
@@ -892,13 +919,14 @@ if __name__ == "__main__":
     )
 
     # Save joblib artifact for predict_blind.py
-    predictor = FinetunePredictor650M(final_model_path)
+    predictor = FinetunePredictor650M(final_model_path, max_len=args.max_len)
     artifact = {
         "model":             predictor,
         "scaler":            None,
         "feature_source":    "finetune_650m",
         "esm_model_name":    ESM_MODEL_NAME,
         "esm_embedding_dim": EMB_DIM,
+        "max_len":           args.max_len,
         "cv_scores":         summary,
         "model_name":        "ESM2-650M-Finetune",
     }

@@ -16,16 +16,16 @@ cd protein-classificattion-project
 #    class0_rep_seq.fasta.txt, ec1_rep_seq.fasta.txt, ..., ec6_rep_seq.fasta.txt
 
 # 3. Bootstrap the environment (installs PyTorch + all dependencies):
-bash runpod/setup.sh
+bash src/runpod/setup.sh
 
 # 4a. Full pipeline (all stages, ~9-14 hours):
-bash runpod/run_full_pipeline.sh
+bash src/runpod/run_full_pipeline.sh
 
 # 4b. Or run only the 650M fine-tuning (if embeddings + XGBoost are already done):
-SKIP_STAGES="1 2 3" bash runpod/run_full_pipeline.sh
+SKIP_STAGES="1 2 3" bash src/runpod/run_full_pipeline.sh
 
 # 4c. Or run just the 650M fine-tuning directly:
-bash runpod/train_650m.sh
+bash src/runpod/train_650m.sh
 ```
 
 ---
@@ -98,7 +98,7 @@ the upper layers and head to specialise for enzyme classification.
 ### Gradient Checkpointing (optional)
 
 ```bash
-GRAD_CKPT=1 bash runpod/train_650m.sh
+GRAD_CKPT=1 bash src/runpod/train_650m.sh
 ```
 
 Halves activation memory (~14-18 GB instead of 20-28 GB) at the cost of
@@ -127,13 +127,13 @@ RETRAIN_EPOCHS=    # leave blank to reuse EPOCHS for the final retrain
 
 ```bash
 # Skip embedding extraction and XGBoost (re-use cached outputs):
-SKIP_STAGES="1 2" bash runpod/run_full_pipeline.sh
+SKIP_STAGES="1 2" bash src/runpod/run_full_pipeline.sh
 
 # Skip everything except the 650M fine-tuning and ensemble eval:
-SKIP_STAGES="1 2 3" bash runpod/run_full_pipeline.sh
+SKIP_STAGES="1 2 3" bash src/runpod/run_full_pipeline.sh
 
 # Skip all training and only re-run ensemble + plots:
-SKIP_STAGES="1 2 3 4" bash runpod/run_full_pipeline.sh
+SKIP_STAGES="1 2 3 4" bash src/runpod/run_full_pipeline.sh
 ```
 
 ---

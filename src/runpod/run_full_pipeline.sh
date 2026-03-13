@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# runpod/run_full_pipeline.sh
+# src/runpod/run_full_pipeline.sh
 #
 # Complete end-to-end pipeline on a RunPod A40 (48 GB VRAM).
 # Runs every model stage in order and produces all artefacts needed for:
@@ -18,8 +18,8 @@
 #
 # Usage
 # -----
-#   bash runpod/run_full_pipeline.sh           # all stages
-#   SKIP_STAGES="1 2" bash runpod/run_full_pipeline.sh  # skip already-done stages
+#   bash src/runpod/run_full_pipeline.sh           # all stages
+#   SKIP_STAGES="1 2" bash src/runpod/run_full_pipeline.sh  # skip already-done stages
 #
 # Estimated total wall-clock time on A40
 # ---------------------------------------
@@ -44,7 +44,7 @@ error()   { echo -e "${RED}[pipeline]${NC} $*" >&2; exit 1; }
 skip_msg(){ echo -e "${YELLOW}[pipeline]${NC} Skipping stage $1 (in SKIP_STAGES)"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
 PYTHON=$(command -v python3 || command -v python)

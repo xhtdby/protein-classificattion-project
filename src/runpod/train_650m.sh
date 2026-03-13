@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # =============================================================================
-# runpod/train_650m.sh
+# src/runpod/train_650m.sh
 #
 # Launch ESM-2 650M fine-tuning on a RunPod A40 (48 GB VRAM).
 #
 # Usage
 # -----
-#   bash runpod/train_650m.sh                # default A40 settings
-#   bash runpod/train_650m.sh --epochs 20    # override epoch count
-#   GRAD_CKPT=1 bash runpod/train_650m.sh   # enable gradient checkpointing
+#   bash src/runpod/train_650m.sh                # default A40 settings
+#   bash src/runpod/train_650m.sh --epochs 20    # override epoch count
+#   GRAD_CKPT=1 bash src/runpod/train_650m.sh   # enable gradient checkpointing
 #
 # Default hyper-parameters (tuned for A40 48 GB)
 # ------------------------------------------------
@@ -40,7 +40,7 @@ warn()  { echo -e "${YELLOW}[train_650m]${NC} $*"; }
 error() { echo -e "${RED}[train_650m]${NC} $*" >&2; exit 1; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "${PROJECT_ROOT}"
 
 PYTHON=$(command -v python3 || command -v python)

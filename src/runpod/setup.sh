@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # =============================================================================
-# runpod/setup.sh
+# src/runpod/setup.sh
 #
 # One-shot environment bootstrap for the protein-classification project on a
 # RunPod pod (or any Ubuntu/Debian machine) equipped with an A40 GPU (48 GB).
 #
 # Usage
 # -----
-#   bash runpod/setup.sh
+#   bash src/runpod/setup.sh
 #
 # What it does
 # ------------
@@ -34,10 +34,10 @@ warn()  { echo -e "${YELLOW}[setup]${NC} $*"; }
 error() { echo -e "${RED}[setup]${NC} $*" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
-# 0. Locate the project root (directory containing this script's parent)
+# 0. Locate the project root (two directories up from src/runpod/)
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 info "Project root: ${PROJECT_ROOT}"
 cd "${PROJECT_ROOT}"
 
@@ -129,4 +129,4 @@ import torch, esm, numpy, pandas, sklearn, xgboost, Bio, joblib, tqdm
 print('  All key packages imported successfully')
 "
 
-info "Setup complete!  Run  bash runpod/train_650m.sh  to start fine-tuning."
+info "Setup complete!  Run  bash src/runpod/train_650m.sh  to start fine-tuning."
