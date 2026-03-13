@@ -189,6 +189,198 @@ Inference entrypoint for blind challenge format. Supports:
 \item ensemble mode when both are supplied
 \end{itemize}
 
+\section{Feature Engineering}
+\subsection{Handcrafted Features (429-d)}
+\textbf{Amino acid composition (20-d):} Normalised frequency of each of the 20 canonical amino
+acids. Each row sums to approximately 1.0.
+
+\textbf{Dipeptide frequencies (400-d):} Normalised frequency of each ordered amino acid pair
+(AA, AC, \ldots, YY). Captures local sequential patterns.
+
+\textbf{Sequence length (1-d):} Raw integer count of amino acids.
+
+\textbf{Physicochemical properties (8-d):} Molecular weight (Da), isoelectric point (pI),
+aromaticity (fraction Phe + Trp + Tyr), GRAVY (Kyte--Doolittle), charge at pH 7.0,
+helix fraction, turn fraction, sheet fraction (all Chou--Fasman).
+
+\subsection{ESM-2 Embeddings}
+ESM-2 is a protein language model pre-trained on millions of protein sequences.
+Used as a \textbf{feature extractor}---no label information is leaked:
+\begin{enumerate}
+\item Tokenise the amino acid sequence.
+\item Forward pass through the transformer.
+\item Mean-pool over the sequence dimension (excluding BOS/EOS tokens).
+\item Output: a dense vector (320-d for 8M; 1\,280-d for 650M).
+\end{enumerate}
+
+Embeddings are \textbf{stateless} and safe to pre-compute once before cross-validation.
+\texttt{StandardScaler} normalisation is still fit on the training fold only.
+
+\subsection{Feature Combination Results}
+
+\begin{table}[H]
+\centering
+\caption{Feature ablation (XGBoost, balanced weights).}
+\begin{tabular}{lcc}
+\toprule
+Feature Set & Dimensions & Macro F1 \\
+\midrule
+Handcrafted only & 429 & 0.206 \\
+ESM-2 650M only & 1280 & 0.562 \\
+ESM-2 + all Handcrafted & 1709 & 0.552 \\
+\textbf{ESM-2 + Physicochemical} & \textbf{1288} & \textbf{0.575} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Adding the full 429-d handcrafted vector to ESM-2 features \textbf{hurts} performance---the
+400 dipeptide dimensions introduce noise.
+The 8-d physicochemical features provide complementary signal (especially molecular weight).
+
+\section{Model Training}
+\subsection{Cross-Validation Protocol}
+All experiments use \textbf{stratified 5-fold cross-validation} with \texttt{seed = 42}.
+Stratification preserves the original class proportions in every fold.
+
+\subsection{Class Imbalance Strategies}
+\begin{table}[H]
+\centering
+\caption{Imbalance-handling strategies per model family.}
+\begin{tabular}{ll}
+\toprule
+Strategy & Where Used \\
+\midrule
+\texttt{class\_weight='balanced'} & Logistic Regression, Random Forest \\
+Balanced sample weights & XGBoost \\
+SMOTE (training fold only) & XGBoost + SMOTE, LightGBM + SMOTE \\
+Weighted cross-entropy loss & Fine-tuned ESM-2 8M \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics}
+Every experiment reports four complementary metrics: \textbf{Accuracy} (biased by class 0),
+\textbf{Macro F1} (primary selection metric---penalises poor minority-class performance),
+\textbf{Balanced Accuracy} (average recall per class), and \textbf{MCC} (robust to imbalance).
+
+\subsection{Model Progression}
+\begin{verbatim}
+Logistic Regression (handcrafted)   -> Macro F1: 0.191
+Random Forest (handcrafted)         -> Macro F1: 0.141
+XGBoost (ESM-2 650M + physico)      -> Macro F1: 0.575  (+200%)
+XGBoost + SMOTE                     -> Macro F1: 0.595  (+3.5%)
+Fine-tuned ESM-2 8M                 -> Macro F1: 0.509
+Ensemble (8M FT + XGBoost 650M)     -> Macro F1: 0.625  (+5%)
+\end{verbatim}
+
+\section{Evaluation Framework}
+\subsection{Metrics Computation}
+\begin{verbatim}
+from src.evaluation import compute_metrics
+metrics = compute_metrics(y_true, y_pred)
+# {'accuracy': 0.886, 'macro_f1': 0.595,
+#  'balanced_accuracy': 0.552, 'mcc': 0.631}
+\end{verbatim}
+
+\subsection{Confusion Matrices}
+All confusion matrices are \textbf{row-normalised} (each row sums to 1.0), showing the
+proportion of true-class samples predicted as each class. Saved as PNG heatmaps.
+
+\subsection{Result Persistence}
+All experiment results are saved as JSON files in \texttt{outputs/}:
+\texttt{baseline\_results.json}, \texttt{advanced\_results.json},
+\texttt{finetune\_results.json}, \texttt{ensemble\_results.json},
+\texttt{confidence\_results.json}, \texttt{interpretability\_results.json}.
+
+\section{Interpretability}
+Interpretability analyses are conducted on the best single model (XGBoost + SMOTE).
+This model is selected because it achieves the highest Macro F1 among individual models (0.595),
+SHAP's \texttt{TreeExplainer} is specifically designed for gradient-boosted trees and is
+computationally tractable, and decomposing ensemble interpretability across two different
+architectures would be significantly more complex.
+
+\subsection{Feature Importance}
+XGBoost Gini (gain-based) importance shows that \textbf{ESM-2 embedding dimensions dominate}
+the top-20 features.
+The most important single handcrafted feature is \texttt{molecular\_weight} (rank 5).
+
+\subsection{SHAP Analysis}
+SHAP values (TreeExplainer, 500-sample subsample) provide per-instance feature attributions.
+ESM-2 dimensions 112, 308, and 216 are the most globally important;
+physicochemical features contribute modestly but consistently.
+
+\subsection{Per-Class Error Analysis}
+\begin{table}[H]
+\centering
+\caption{Per-class metrics for XGBoost + SMOTE (OOF).}
+\begin{tabular}{lccc}
+\toprule
+Class & Precision & Recall & F1 \\
+\midrule
+Not enzyme & 0.934 & 0.938 & 0.936 \\
+Oxidoreductase & 0.586 & 0.629 & 0.607 \\
+Transferase & 0.579 & 0.653 & 0.614 \\
+Hydrolase & 0.554 & 0.565 & 0.559 \\
+Lyase & 0.329 & 0.192 & 0.242 \\
+Isomerase & 0.554 & 0.200 & 0.293 \\
+Ligase & 0.603 & 0.426 & 0.499 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{High-Confidence Error Analysis}
+Of 5\,312 total errors, 1\,499 (28.2\%) are high-confidence errors ($p \ge 0.80$).
+These are disproportionately predicted as Not enzyme (785 predictions), which is
+the model's strongest attractor under class imbalance.
+
+\section{Confidence Scoring}
+\begin{verbatim}
+from src.confidence import assign_confidence
+confidences = assign_confidence(proba)  # proba shape: (N, 7)
+# Returns: ["High", "Medium", "Low", ...]
+\end{verbatim}
+
+\begin{table}[H]
+\centering
+\caption{Calibration results (XGBoost + SMOTE OOF predictions).}
+\begin{tabular}{lccc}
+\toprule
+Level & Count & Accuracy & Mean Max Prob \\
+\midrule
+High ($p \ge 0.80$) & 30\,448 (76.6\%) & 95.1\% & 0.959 \\
+Medium ($0.50 \le p < 0.80$) & 6\,658 (16.7\%) & 66.2\% & 0.663 \\
+Low ($p < 0.50$) & 2\,658 (6.7\%) & 41.2\% & 0.411 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The model is \textbf{well-calibrated}: high-confidence predictions are genuinely reliable.
+
+\section{Blind Prediction Pipeline}
+\texttt{src/predict\_blind.py} provides a complete inference pipeline:
+\begin{enumerate}
+\item Accepts any FASTA file (not just training data).
+\item Detects model artefact type (sklearn / neural network).
+\item Supports ensemble mode when both \texttt{--model} and \texttt{--model-finetune} are supplied.
+\item Applies the same preprocessing (feature extraction + scaling) as during training.
+\item Applies per-class thresholds if optimised.
+\item Writes output in the required format.
+\end{enumerate}
+
+Usage examples:
+\begin{verbatim}
+# Single model
+python -m src.predict_blind \
+    --fasta blind_test.fasta \
+    --model outputs/models/best_model.joblib
+
+# Ensemble (recommended)
+python -m src.predict_blind \
+    --fasta blind_test.fasta \
+    --model outputs/models/best_model.joblib \
+    --model-finetune outputs/models/finetune_artifact.joblib
+\end{verbatim}
+
 \section{Data-Leakage Prevention}
 Critical rules:
 \begin{enumerate}
@@ -200,9 +392,19 @@ Critical rules:
 \end{enumerate}
 
 \section{Reproducibility}
-All RNG seeds are fixed to 42 across random, NumPy, and PyTorch.
-Stratified K-fold uses shuffling with fixed random state.
-Result files are persisted as JSON and model artifacts for reproducibility without retraining.
+All RNG seeds are fixed to 42 across \texttt{random}, NumPy, and PyTorch:
+\begin{verbatim}
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
+\end{verbatim}
+
+\texttt{StratifiedKFold(shuffle=True, random\_state=42)} ensures identical folds across runs.
+XGBoost and LightGBM use \texttt{random\_state=42}; PyTorch fine-tuning seeds are set per fold.
+All experiment results are saved as JSON files enabling exact reproduction of figures and tables
+without retraining.
 
 \section{Results Summary (Generated Artifacts)}
 \begin{table}[H]
@@ -220,7 +422,7 @@ LightGBM (650M + physico) & 0.879 & 0.515 & 0.467 & 0.605 \\
 LightGBM + SMOTE & 0.880 & 0.576 & 0.535 & 0.620 \\
 XGBoost + SMOTE & 0.886 & 0.595 & 0.552 & 0.631 \\
 ESM-2 8M Fine-tune & 0.823 & 0.509 & 0.570 & 0.553 \\
-\textbf{Ensemble} & \textbf{0.890} & \textbf{0.625} & \textbf{0.605} & \textbf{0.659} \\
+\textbf{Ensemble} & \textbf{0.890} & \textbf{0.625} & \textbf{0.604} & \textbf{0.659} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -262,35 +464,103 @@ Generated figures currently present under \texttt{outputs/figures/}:
 \caption{Ensemble confusion matrix generated from blended OOF probabilities.}
 \end{figure}
 
+\section{Extension Guide}
+\subsection{Adding a New Feature Extractor}
+\begin{enumerate}
+\item Create \texttt{src/features/new\_feature.py} following the pattern of \texttt{composition.py}:
+implement \texttt{extract\_new\_features(sequences)} $\to$ \texttt{np.ndarray} and
+\texttt{get\_feature\_names()} $\to$ \texttt{list[str]}.
+\item Add the new features to the ablation study in \texttt{src/models/advanced.py}.
+\item Update \texttt{src/predict\_blind.py} to handle the new feature source.
+\end{enumerate}
+
+\subsection{Adding a New Model}
+\begin{enumerate}
+\item Create a factory function in \texttt{src/models/} (e.g.\ \texttt{make\_catboost()}).
+\item Call it through \texttt{cross\_validate\_model} in \texttt{src/training.py}.
+\item Add the results to the comparison table in \texttt{src/evaluation.py}.
+\end{enumerate}
+
+\subsection{Upgrading the ESM-2 Model}
+To fine-tune \texttt{esm2\_t33\_650M\_UR50D} instead of the 8M model:
+\begin{enumerate}
+\item Update \texttt{ESM\_MODEL\_NAME} and \texttt{EMB\_DIM} in \texttt{src/models/finetune.py}.
+\item Reduce \texttt{MAX\_LEN} and \texttt{batch\_size} to fit in VRAM (24 GB+ recommended).
+\item Consider freezing early transformer layers to reduce memory usage.
+\end{enumerate}
+
+\subsection{Potential Improvements}
+\begin{table}[H]
+\centering
+\caption{Candidate improvements with estimated impact and implementation difficulty.}
+\begin{tabular}{lll}
+\toprule
+Improvement & Expected Impact & Difficulty \\
+\midrule
+Fine-tune 650M model & $+$5--10\% Macro F1 & High (24 GB+ VRAM) \\
+Focal loss in fine-tuning & $+$2--5\% on minority classes & Medium \\
+Hierarchical classification & $+$1--3\% Macro F1 & Medium \\
+Per-class threshold tuning (ensemble) & $+$0.5--1\% & Low \\
+Sequence-level attention visualisation & Interpretability only & High \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Troubleshooting}
 \subsection{CUDA Out of Memory}
-Reduce batch size, reduce max sequence length, or increase gradient accumulation.
+Reduce batch size, reduce max sequence length (\texttt{--max-len 256}),
+or increase gradient accumulation (\texttt{--grad-accum 8}) to maintain effective batch size.
+
+\subsection{ESM-2 Model Download Fails}
+The \texttt{fair-esm} library downloads model weights on first use.
+If behind a firewall, download the checkpoint manually from the ESM GitHub repository
+and place it in the \texttt{torch.hub} cache directory.
 
 \subsection{SMOTE Failure}
-If class sizes become too small in custom subsets, reduce \texttt{k\_neighbors}.
+SMOTE requires at least $k\_\mathrm{neighbors} + 1$ samples per class.
+With default $k = 5$, classes with $\le 5$ samples will fail.
+Our smallest class (Ligase, $n = 282$) is well above this threshold,
+but if you subsample the data, reduce \texttt{k\_neighbors} accordingly.
 
 \subsection{Dimension Mismatch in Blind Prediction}
 When changing feature source or ESM model size, retrain and resave artifacts
 so expected feature dimensionality remains consistent.
 
 \section{Appendix: Output File Reference}
-\subsection{JSON Files}
-\begin{itemize}
-\item \texttt{outputs/baseline\_results.json}
-\item \texttt{outputs/advanced\_results.json}
-\item \texttt{outputs/finetune\_results.json}
-\item \texttt{outputs/ensemble\_results.json}
-\item \texttt{outputs/confidence\_results.json}
-\item \texttt{outputs/interpretability\_results.json}
-\end{itemize}
+\subsection{JSON Result Files}
+\begin{table}[H]
+\centering
+\caption{JSON result files produced by each training phase.}
+\begin{tabular}{ll}
+\toprule
+File & Content \\
+\midrule
+\texttt{baseline\_results.json} & 3 baseline models: per-fold and summary metrics \\
+\texttt{advanced\_results.json} & 5 advanced models + 4 ablation configs + best-model params \\
+\texttt{finetune\_results.json} & 5-fold fine-tuning metrics + configuration \\
+\texttt{ensemble\_results.json} & Ensemble weights, thresholds, blended metrics \\
+\texttt{confidence\_results.json} & Per-level accuracy and mean probability \\
+\texttt{interpretability\_results.json} & Top features, per-class metrics, high-confidence errors \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Model and Cache Artifacts}
-\begin{itemize}
-\item \texttt{outputs/models/best\_model.joblib}
-\item \texttt{outputs/models/finetune\_artifact.joblib}
-\item \texttt{outputs/models/finetune\_final.pt}
-\item \texttt{outputs/models/xgb\_oof\_proba.npy}
-\item \texttt{outputs/models/xgb\_oof\_true.npy}
-\end{itemize}
+\begin{table}[H]
+\centering
+\caption{Model artefacts and their approximate sizes.}
+\begin{tabular}{lll}
+\toprule
+File & Content & Size \\
+\midrule
+\texttt{best\_model.joblib} & XGBoost + scaler + thresholds + OOF data & $\approx$50 MB \\
+\texttt{finetune\_artifact.joblib} & \texttt{FinetunePredictor} (lazy-loads PyTorch model) & $\approx$1 MB \\
+\texttt{finetune\_final.pt} & PyTorch state dict (full-dataset retrained) & $\approx$35 MB \\
+\texttt{finetune\_fold\{1--5\}.pt} & Per-fold best checkpoints & $\approx$35 MB each \\
+\texttt{xgb\_oof\_proba.npy} & XGBoost OOF probability arrays & $\approx$2 MB \\
+\texttt{xgb\_oof\_true.npy} & OOF true label array & $<$1 MB \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}
