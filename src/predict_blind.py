@@ -15,6 +15,10 @@ Ensemble usage (fine-tuned ESM-2 8M + XGBoost 650M soft vote):
     python -m src.predict_blind --fasta <path> \\
         --model outputs/models/best_model.joblib \\
         --model-finetune outputs/models/finetune_artifact.joblib
+
+Fine-tuned ESM-2 650M (highest accuracy single model):
+    python -m src.predict_blind --fasta <path> \\
+        --model-ft650m outputs/models/finetune_650m_artifact.joblib
 """
 
 import argparse
@@ -95,19 +99,24 @@ def extract_features(
 
 def predict_blind(
     fasta_path: Path,
-    model_path: Path,
+    model_path: Path | None,
     output_path: Path,
     finetune_path: Path | None = None,
+    ft650m_path: Path | None = None,
 ) -> None:
     """Full blind prediction pipeline.
 
     Args:
         fasta_path:    Path to input FASTA file.
         model_path:    Path to primary saved model (.joblib) -- XGBoost 650M.
+                       May be None when ft650m_path is provided.
         output_path:   Path for output predictions file.
         finetune_path: Optional path to finetune_artifact.joblib.  When
                        provided the soft-vote ensemble (fine-tuned ESM-2 8M +
                        XGBoost 650M) is used instead of the single model.
+        ft650m_path:   Optional path to finetune_650m_artifact.joblib.  When
+                       provided the fine-tuned ESM-2 650M model is used as a
+                       standalone predictor (highest accuracy single model).
     """
     # Parse FASTA
     seq_ids, sequences = load_fasta_sequences(fasta_path)
@@ -117,9 +126,19 @@ def predict_blind(
         raise ValueError(f"No sequences found in {fasta_path}")
 
     # ------------------------------------------------------------------
+    # Fine-tuned ESM-2 650M standalone mode
+    # ------------------------------------------------------------------
+    if ft650m_path is not None:
+        logger.info("Fine-tuned 650M mode: %s", ft650m_path)
+        artefact = joblib.load(ft650m_path)
+        model    = artefact["model"]
+        y_proba  = model.predict_proba(sequences)
+        y_pred   = y_proba.argmax(axis=1)
+
+    # ------------------------------------------------------------------
     # Ensemble mode: soft-vote of fine-tuned 8M + XGBoost 650M
     # ------------------------------------------------------------------
-    if finetune_path is not None:
+    elif finetune_path is not None:
         logger.info("Ensemble mode: %s + %s", model_path, finetune_path)
         from src.models.ensemble import EnsemblePredictor
         from src.evaluation import load_results_json
@@ -153,6 +172,10 @@ def predict_blind(
     # Single-model mode
     # ------------------------------------------------------------------
     else:
+        if model_path is None:
+            raise ValueError(
+                "Provide at least one of --model, --model-finetune, or --model-ft650m"
+            )
         artefact       = joblib.load(model_path)
         model          = artefact["model"]
         scaler         = artefact["scaler"]
@@ -167,7 +190,7 @@ def predict_blind(
         )
 
         # Fine-tuned ESM-2 model: raw sequences go directly to the model
-        if feature_source.lower() == "finetune":
+        if feature_source.lower() in ("finetune", "finetune_650m"):
             logger.info("Fine-tuned model detected -- passing raw sequences directly")
             y_proba = model.predict_proba(sequences)
             y_pred  = y_proba.argmax(axis=1)
@@ -222,7 +245,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Blind challenge predictions")
     parser.add_argument("--fasta", type=Path, required=True, help="Input FASTA file")
     parser.add_argument(
-        "--model", type=Path, default=Path("outputs/models/best_model.joblib"),
+        "--model", type=Path, default=None,
         help="Path to primary saved model (XGBoost 650M)",
     )
     parser.add_argument(
@@ -231,9 +254,24 @@ if __name__ == "__main__":
              "ensemble mode (soft-vote of both models).",
     )
     parser.add_argument(
+        "--model-ft650m", dest="model_ft650m", type=Path, default=None,
+        help="Path to fine-tuned ESM-2 650M artefact (finetune_650m_artifact.joblib). "
+             "When provided, the 650M fine-tuned model is used as the sole predictor "
+             "(highest accuracy single-model option).",
+    )
+    parser.add_argument(
         "--output", type=Path, default=Path("outputs/predictions/blind_predictions.txt"),
         help="Output predictions file",
     )
     args = parser.parse_args()
 
-    predict_blind(args.fasta, args.model, args.output, finetune_path=args.model_finetune)
+    if args.model is None and args.model_finetune is None and args.model_ft650m is None:
+        parser.error(
+            "Provide at least one of --model, --model-finetune, or --model-ft650m"
+        )
+
+    predict_blind(
+        args.fasta, args.model, args.output,
+        finetune_path=args.model_finetune,
+        ft650m_path=args.model_ft650m,
+    )
