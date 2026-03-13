@@ -9,14 +9,14 @@ __pycache__/
 # Large cached features (regenerate with scripts)
 outputs/features/*.npy
 
-# Temporary scratch logs
-advanced_esm_log.txt
-interp_log.txt
-outputs/interp_log*.txt
-outputs/interp_subprocess.txt
-outputs/test_stdout.txt
-outputs/*_run.txt
-outputs/*_log*.txt
+# # Temporary scratch logs
+# advanced_esm_log.txt
+# interp_log.txt
+# outputs/interp_log*.txt
+# outputs/interp_subprocess.txt
+# outputs/test_stdout.txt
+# outputs/*_run.txt
+# outputs/*_log*.txt
 
 # Coursework HTML
 *.html
