@@ -1,0 +1,38 @@
+{
+  "model_name": "Ensemble (Fine-tuned 8M + XGBoost 650M)",
+  "w_finetune": 0.46083261667544073,
+  "w_xgboost": 0.5391673833245592,
+  "ft_oof_macro_f1": 0.5092454495394656,
+  "xgb_oof_macro_f1": 0.5958096856922522,
+  "metrics_plain": {
+    "accuracy": 0.8903027864399959,
+    "macro_f1": 0.6245745847589952,
+    "balanced_accuracy": 0.604434529730366,
+    "mcc": 0.6584580471371699
+  },
+  "metrics_optimised": {
+    "accuracy": 0.8903530831908258,
+    "macro_f1": 0.6246954676733568,
+    "balanced_accuracy": 0.6045377129321409,
+    "mcc": 0.6586324906598016
+  },
+  "thresholds": [
+    1.0,
+    0.9998750078121746,
+    0.9998750078121746,
+    0.9998750078121746,
+    1.0,
+    0.9998750078121746,
+    0.9998750078121746
+  ],
+  "summary": {
+    "accuracy_mean": 0.8903530831908258,
+    "accuracy_std": 0.0,
+    "macro_f1_mean": 0.6246954676733568,
+    "macro_f1_std": 0.0,
+    "balanced_accuracy_mean": 0.6045377129321409,
+    "balanced_accuracy_std": 0.0,
+    "mcc_mean": 0.6586324906598016,
+    "mcc_std": 0.0
+  }
+}
