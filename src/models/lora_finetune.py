@@ -231,14 +231,20 @@ class LoRAPredictor:
 
     def predict_proba(self, sequences: list[str], batch_size: int = 2) -> np.ndarray:
         device = (torch.device("cuda") if torch.cuda.is_available()
+                  else torch.device("mps") if (hasattr(torch.backends, "mps")
+                                               and torch.backends.mps.is_available())
                   else torch.device("cpu"))
         import esm as esm_lib
 
         esm_model, alphabet = esm_lib.pretrained.esm2_t33_650M_UR50D()
         inject_lora(esm_model, rank=self.lora_rank, alpha=self.lora_alpha)
+        freeze_base_model(esm_model)
         model = LoRAESM2Classifier(esm_model).to(device)
         state = torch.load(self.model_path, map_location=device, weights_only=True)
-        model.load_state_dict(state, strict=False)
+        # Load only LoRA + classifier weights (base model is frozen)
+        missing, unexpected = model.load_state_dict(state, strict=False)
+        if unexpected:
+            logger.warning("Unexpected keys in checkpoint: %s", unexpected)
         model.eval()
 
         batch_converter = alphabet.get_batch_converter()

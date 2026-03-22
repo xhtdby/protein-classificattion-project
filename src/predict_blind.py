@@ -218,8 +218,12 @@ def predict_blind(
             y_pred  = y_proba.argmax(axis=1)
         elif feature_source.lower() == "cascade":
             logger.info("Cascade model detected -- extracting features for cascade")
+            # Cascade model stores its feature source in the artifact
+            cascade_feat_source = artefact.get(
+                "cascade_feature_source", "ESM-2 + Physicochemical"
+            )
             X = extract_features(
-                sequences, artefact.get("_cascade_feature_source", "ESM-2 + Physicochemical"),
+                sequences, cascade_feat_source,
                 model_name=esm_model_name,
             )
             y_proba = model.predict_proba(X)

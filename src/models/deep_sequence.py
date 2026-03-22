@@ -295,6 +295,7 @@ def _run_epoch(
     train: bool = True,
     scheduler=None,
     grad_accum: int = 1,
+    grad_scaler: torch.amp.GradScaler | None = None,
 ) -> dict:
     model.train(train)
     total_loss = 0.0
@@ -303,7 +304,8 @@ def _run_epoch(
 
     amp_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
     amp_enabled = device.type == "cuda"
-    grad_scaler = torch.amp.GradScaler(enabled=amp_enabled)
+    if grad_scaler is None:
+        grad_scaler = torch.amp.GradScaler(enabled=amp_enabled)
     n_batches = len(loader)
 
     if train and optimizer is not None:
@@ -457,14 +459,16 @@ def cross_validate_deep_seq(
         ckpt_path = checkpoints_dir / f"deep_seq_{arch}_fold{fold_i+1}.pt"
         best_oof_preds = None
         best_oof_proba = None
+        amp_enabled = device.type == "cuda"
+        grad_scaler = torch.amp.GradScaler(enabled=amp_enabled)
 
         for epoch in range(1, epochs + 1):
             t_ep = time.time()
             tr = _run_epoch(model, train_loader, criterion, optimizer,
                             device, train=True, scheduler=scheduler,
-                            grad_accum=grad_accum)
+                            grad_accum=grad_accum, grad_scaler=grad_scaler)
             vl = _run_epoch(model, val_loader, criterion, None,
-                            device, train=False)
+                            device, train=False, grad_scaler=grad_scaler)
 
             improved = vl["macro_f1"] > best_val_f1
             marker = " * NEW BEST" if improved else ""

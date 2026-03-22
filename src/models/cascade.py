@@ -406,7 +406,8 @@ if __name__ == "__main__":
     artifact_path = models_dir / "cascade_model.joblib"
     joblib.dump({
         "model": cascade_model,
-        "feature_source": feature_source,
+        "feature_source": "cascade",
+        "cascade_feature_source": feature_source,
         "esm_model_name": esm_model_name,
         "esm_embedding_dim": esm_X.shape[1],
         "thresholds": thresholds,

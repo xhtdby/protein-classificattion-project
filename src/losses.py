@@ -121,7 +121,10 @@ def compute_focal_alpha(
         total = counts.sum()
         alpha = total / (n_classes * counts)
     elif method == "effective":
-        # Effective number of samples (beta=0.9999)
+        # Effective number of samples (Cui et al., "Class-Balanced Loss
+        # Based on Effective Number of Samples", CVPR 2019).
+        # beta close to 1.0 gives more weight to rare classes; 0.9999
+        # is the recommended default for highly imbalanced datasets.
         beta = 0.9999
         effective = 1.0 - np.power(beta, counts)
         alpha = (1.0 - beta) / effective
