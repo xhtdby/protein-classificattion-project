@@ -15,6 +15,12 @@ Ensemble usage (fine-tuned ESM-2 8M + XGBoost 650M soft vote):
     python -m src.predict_blind --fasta <path> \\
         --model outputs/models/best_model.joblib \\
         --model-finetune outputs/models/finetune_artifact.joblib
+
+Cascade model:
+    python -m src.predict_blind --fasta <path> --model outputs/models/cascade_model.joblib
+
+LoRA fine-tuned ESM-2 650M:
+    python -m src.predict_blind --fasta <path> --model outputs/models/lora_artifact.joblib
 """
 
 import argparse
@@ -202,11 +208,26 @@ def predict_blind(
             model_path, feature_source, esm_model_name, expected_dim,
         )
 
-        # Fine-tuned ESM-2 model: raw sequences go directly to the model
-        if feature_source.lower() == "finetune":
-            logger.info("Fine-tuned model detected -- passing raw sequences directly")
+        # Models that handle raw sequences internally (fine-tune, LoRA, cascade)
+        if feature_source.lower() in ("finetune", "lora_finetune"):
+            logger.info(
+                "%s model detected -- passing raw sequences directly",
+                feature_source,
+            )
             y_proba = model.predict_proba(sequences)
             y_pred  = y_proba.argmax(axis=1)
+        elif feature_source.lower() == "cascade":
+            logger.info("Cascade model detected -- extracting features for cascade")
+            X = extract_features(
+                sequences, artefact.get("_cascade_feature_source", "ESM-2 + Physicochemical"),
+                model_name=esm_model_name,
+            )
+            y_proba = model.predict_proba(X)
+            if thresholds is not None:
+                adjusted = y_proba / thresholds[np.newaxis, :]
+                y_pred = adjusted.argmax(axis=1)
+            else:
+                y_pred = y_proba.argmax(axis=1)
         else:
             X = extract_features(sequences, feature_source, model_name=esm_model_name)
             if X.shape[1] != scaler.n_features_in_:
