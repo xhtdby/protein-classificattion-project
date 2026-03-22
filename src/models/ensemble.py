@@ -38,10 +38,13 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
+import pathlib
 import sys
 import time
 import warnings
 from pathlib import Path
+from contextlib import contextmanager
 
 import joblib
 import numpy as np
@@ -81,6 +84,33 @@ def _compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, float]
         "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
         "mcc":               float(matthews_corrcoef(y_true, y_pred)),
     }
+
+
+@contextmanager
+def _posixpath_compat_on_windows():
+    """Temporarily map PosixPath to WindowsPath for legacy pickles on Windows."""
+    if os.name != "nt":
+        yield
+        return
+
+    original = pathlib.PosixPath
+    pathlib.PosixPath = pathlib.WindowsPath  # type: ignore[assignment]
+    try:
+        yield
+    finally:
+        pathlib.PosixPath = original  # type: ignore[assignment]
+
+
+def _joblib_load_compat(path: Path) -> dict:
+    """Load joblib artifacts with cross-platform pickle compatibility."""
+    try:
+        return joblib.load(path)
+    except Exception as exc:
+        message = str(exc)
+        if "cannot instantiate 'PosixPath'" in message:
+            with _posixpath_compat_on_windows():
+                return joblib.load(path)
+        raise
 
 
 # ---------------------------------------------------------------------------
@@ -332,12 +362,12 @@ class EnsemblePredictor:
 
         # Fine-tuned 8M
         print("  [Ensemble] Running fine-tuned ESM-2 8M...", flush=True)
-        ft_artefact = joblib.load(self.finetune_artifact_path)
+        ft_artefact = _joblib_load_compat(self.finetune_artifact_path)
         proba_ft    = ft_artefact["model"].predict_proba(sequences)
 
         # XGBoost 650M
         print("  [Ensemble] Running XGBoost 650M...", flush=True)
-        xgb_artefact = joblib.load(self.xgb_artifact_path)
+        xgb_artefact = _joblib_load_compat(self.xgb_artifact_path)
         xgb_model    = xgb_artefact["model"]
         xgb_scaler   = xgb_artefact["scaler"]
         feature_src  = xgb_artefact.get("feature_source", "ESM-2 + Physicochemical")

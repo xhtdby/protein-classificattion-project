@@ -33,6 +33,42 @@ from src.confidence import assign_confidence
 logger = logging.getLogger(__name__)
 
 
+class FinetunePredictor:
+    """Compatibility shim for legacy pickles.
+
+    Older artifacts may reference ``src.predict_blind.FinetunePredictor``.
+    Keep this symbol available so joblib can unpickle them, then delegate
+    prediction to the maintained implementation in ``src.models.finetune``.
+    """
+
+    def __init__(self, model_path: Path | str):
+        self.model_path = Path(model_path)
+
+    def _resolve_model_path(self) -> Path:
+        """Resolve stale checkpoint paths embedded in legacy artifacts."""
+        model_path = Path(self.model_path)
+        if model_path.exists():
+            return model_path
+
+        project_root = Path(__file__).resolve().parent.parent
+        candidate = project_root / "outputs" / "models" / model_path.name
+        if candidate.exists():
+            logger.info(
+                "Resolved legacy fine-tune checkpoint path %s -> %s",
+                model_path,
+                candidate,
+            )
+            return candidate
+
+        return model_path
+
+    def predict_proba(self, sequences: list[str], batch_size: int = 32) -> np.ndarray:
+        from src.models.finetune import FinetunePredictor as _FinetunePredictor
+
+        predictor = _FinetunePredictor(self._resolve_model_path())
+        return predictor.predict_proba(sequences, batch_size=batch_size)
+
+
 def load_fasta_sequences(fasta_path: Path) -> tuple[list[str], list[str]]:
     """Parse FASTA file and return (seq_ids, sequences)."""
     seq_ids = []
