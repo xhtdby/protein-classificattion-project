@@ -1,0 +1,19 @@
+[2026-03-23T04:19:14Z] [INFO] ==========================================================
+[2026-03-23T04:19:14Z] [INFO]  LoRA ESM-2 fine-tuning daemon starting
+[2026-03-23T04:19:14Z] [INFO]  Branch  : runpod-results-20260323-041914
+[2026-03-23T04:19:14Z] [INFO]  Repo    : /root/protein-classificattion-project
+[2026-03-23T04:19:14Z] [INFO]  Log     : /root/protein-classificattion-project/outputs/training_daemon.log
+[2026-03-23T04:19:14Z] [INFO] ==========================================================
+[2026-03-23T04:19:14Z] [INFO] SETUP: Configuring git remote authentication...
+[2026-03-23T04:19:14Z] [INFO] SETUP: Remote URL updated to use PAT (credentials not logged).
+[2026-03-23T04:19:14Z] [INFO] SETUP: Verifying CUDA availability...
+  GPU: NVIDIA GeForce RTX 4090
+  VRAM: 24.8 GB free / 25.3 GB total
+[2026-03-23T04:19:20Z] [INFO] ==========================================================
+[2026-03-23T04:19:20Z] [INFO]  ATTEMPT 1 / 3  batch_size=8
+[2026-03-23T04:19:20Z] [INFO] ==========================================================
+--- ATTEMPT 1 START ---
+[2026-03-23T04:19:20Z] [INFO] TRAIN: Launching: python -m src.models.lora_finetune         --batch-size 8         --epochs     10         
+[2026-03-23T04:19:20Z] [INFO] TRAIN: batch_size=8  epochs=10
+Downloading: "https://dl.fbaipublicfiles.com/fair-esm/models/esm2_t33_650M_UR50D.pt" to /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
+Downloading: "https://dl.fbaipublicfiles.com/fair-esm/regression/esm2_t33_650M_UR50D-contact-regression.pt" to /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
