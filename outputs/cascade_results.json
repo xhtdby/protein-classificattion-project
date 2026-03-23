@@ -1,0 +1,30 @@
+{
+  "model_name": "Cascade (ESM-2 + Physicochemical)",
+  "feature_source": "ESM-2 + Physicochemical",
+  "esm_model": "esm2_t33_650M_UR50D",
+  "summary": {
+    "accuracy_mean": 0.8770747172586632,
+    "accuracy_std": 0.001111981789621765,
+    "macro_f1_mean": 0.5606887292671313,
+    "macro_f1_std": 0.008732343716134624,
+    "balanced_accuracy_mean": 0.5314753804505173,
+    "balanced_accuracy_std": 0.007473507908558679,
+    "mcc_mean": 0.6207526772781993,
+    "mcc_std": 0.004967773597249849
+  },
+  "threshold_metrics": {
+    "accuracy": 0.8770747409717332,
+    "macro_f1": 0.5608059672633035,
+    "balanced_accuracy": 0.5314423668108555,
+    "mcc": 0.6207492028987205
+  },
+  "thresholds": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ]
+}

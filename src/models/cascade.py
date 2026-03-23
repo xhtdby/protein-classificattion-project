@@ -348,7 +348,7 @@ if __name__ == "__main__":
 
     # -- Run cascade CV
     print(f"\n{'='*72}")
-    print(f"  HIERARCHICAL CASCADE (Binary → 6-class)")
+    print(f"  HIERARCHICAL CASCADE (Binary -> 6-class)")
     print(f"{'='*72}")
 
     cascade_results = cross_validate_cascade(

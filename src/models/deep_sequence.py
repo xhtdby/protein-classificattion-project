@@ -305,7 +305,8 @@ def _run_epoch(
     amp_dtype = torch.bfloat16 if device.type == "cuda" else torch.float32
     amp_enabled = device.type == "cuda"
     if grad_scaler is None:
-        grad_scaler = torch.amp.GradScaler(enabled=amp_enabled)
+        # GradScaler is only needed for float16; bfloat16 has fp32 dynamic range
+        grad_scaler = torch.amp.GradScaler(enabled=False)
     n_batches = len(loader)
 
     if train and optimizer is not None:
@@ -321,9 +322,10 @@ def _run_epoch(
             with torch.amp.autocast(device_type=device.type, dtype=amp_dtype,
                                     enabled=amp_enabled):
                 logits = model(tokens, seq_lengths)
-                loss = criterion(logits, labels)
-                if train:
-                    loss = loss / grad_accum
+            # Always compute loss in float32 to avoid bfloat16 NaN
+            loss = criterion(logits.float(), labels)
+            if train:
+                loss = loss / grad_accum
 
             if train and optimizer is not None:
                 grad_scaler.scale(loss).backward()
@@ -460,7 +462,8 @@ def cross_validate_deep_seq(
         best_oof_preds = None
         best_oof_proba = None
         amp_enabled = device.type == "cuda"
-        grad_scaler = torch.amp.GradScaler(enabled=amp_enabled)
+        # GradScaler is only needed for float16; bfloat16 has fp32 dynamic range
+        grad_scaler = torch.amp.GradScaler(enabled=False)
 
         for epoch in range(1, epochs + 1):
             t_ep = time.time()
