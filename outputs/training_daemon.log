@@ -17,3 +17,185 @@
 [2026-03-23T04:19:20Z] [INFO] TRAIN: batch_size=8  epochs=10
 Downloading: "https://dl.fbaipublicfiles.com/fair-esm/models/esm2_t33_650M_UR50D.pt" to /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
 Downloading: "https://dl.fbaipublicfiles.com/fair-esm/regression/esm2_t33_650M_UR50D-contact-regression.pt" to /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
+[2026-03-23T04:21:33Z] [INFO] ==========================================================
+[2026-03-23T04:21:33Z] [INFO]  LoRA ESM-2 fine-tuning daemon starting
+[2026-03-23T04:21:33Z] [INFO]  Branch  : runpod-results-20260323-042133
+[2026-03-23T04:21:33Z] [INFO]  Repo    : /root/protein-classificattion-project
+[2026-03-23T04:21:33Z] [INFO]  Log     : /root/protein-classificattion-project/outputs/training_daemon.log
+[2026-03-23T04:21:33Z] [INFO] ==========================================================
+[2026-03-23T04:21:33Z] [INFO] SETUP: Configuring git remote authentication...
+[2026-03-23T04:21:33Z] [INFO] SETUP: Remote URL updated to use PAT (credentials not logged).
+[2026-03-23T04:21:33Z] [INFO] SETUP: Verifying CUDA availability...
+  GPU: NVIDIA GeForce RTX 4090
+  VRAM: 24.8 GB free / 25.3 GB total
+[2026-03-23T04:21:38Z] [INFO] ==========================================================
+[2026-03-23T04:21:38Z] [INFO]  ATTEMPT 1 / 3  batch_size=8
+--- ATTEMPT 1 START ---
+[2026-03-23T04:21:38Z] [INFO] ==========================================================
+[2026-03-23T04:21:38Z] [INFO] TRAIN: Launching: python -m src.models.lora_finetune         --batch-size 8         --epochs     10         
+[2026-03-23T04:21:38Z] [INFO] TRAIN: batch_size=8  epochs=10
+
+========================================================================
+  HARDWARE
+========================================================================
+  Device : cuda
+  GPU    : NVIDIA GeForce RTX 4090
+  VRAM   : 25.3 GB  (24.8 GB free)
+========================================================================
+
+Loading sequences...
+  Loaded 39,764 sequences  [0s]
+  Class distribution: [32410, 1184, 2769, 2108, 600, 411, 282]
+
+========================================================================
+  LoRA FINE-TUNING ESM-2 650M -- 5-fold CV
+  epochs=10  batch=8  grad_accum=8  (effective_batch=64)
+  lr_lora=2e-04  lr_head=1e-03  rank=8  alpha=16.0  focal_gamma=2.0
+========================================================================
+
+------------------------------------------------------------------------
+  FOLD 1/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  LoRA params: 1,351,680  |  Classifier params: 329,735  |  Total trainable: 1,681,415 / 652,724,669 (0.26%)
+  Epoch  1/10  loss=0.1495/0.0958  F1=0.4332  BA=0.5810  [25m 46s] * NEW BEST
+  Epoch  2/10  loss=0.0815/0.0717  F1=0.4985  BA=0.6834  [25m 44s] * NEW BEST
+  Epoch  3/10  loss=0.0533/0.0631  F1=0.5168  BA=0.7329  [25m 47s] * NEW BEST
+  Epoch  4/10  loss=0.0348/0.0668  F1=0.5591  BA=0.7305  [25m 47s] * NEW BEST
+  Epoch  5/10  loss=0.0216/0.0739  F1=0.5899  BA=0.7491  [25m 48s] * NEW BEST
+  Epoch  6/10  loss=0.0137/0.0882  F1=0.5841  BA=0.7344  [25m 48s]
+  Epoch  7/10  loss=0.0099/0.1019  F1=0.6191  BA=0.7189  [25m 45s] * NEW BEST
+  Epoch  8/10  loss=0.0080/0.1107  F1=0.6340  BA=0.7108  [25m 45s] * NEW BEST
+  Epoch  9/10  loss=0.0069/0.1133  F1=0.6302  BA=0.7107  [25m 46s]
+  Epoch 10/10  loss=0.0066/0.1157  F1=0.6368  BA=0.7088  [25m 44s] * NEW BEST
+
+  Fold 1 done  F1=0.6427  BA=0.6777  MCC=0.6253  [4h 54m]
+
+------------------------------------------------------------------------
+  FOLD 2/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  LoRA params: 1,351,680  |  Classifier params: 329,735  |  Total trainable: 1,681,415 / 652,724,669 (0.26%)
+  Epoch  1/10  loss=0.1530/0.1099  F1=0.3625  BA=0.5271  [25m 46s] * NEW BEST
+  Epoch  2/10  loss=0.0818/0.0722  F1=0.5100  BA=0.6856  [25m 44s] * NEW BEST
+  Epoch  3/10  loss=0.0518/0.0658  F1=0.5072  BA=0.7332  [25m 48s]
+  Epoch  4/10  loss=0.0332/0.0671  F1=0.5707  BA=0.7449  [25m 44s] * NEW BEST
+  Epoch  5/10  loss=0.0203/0.0813  F1=0.5831  BA=0.7341  [25m 48s] * NEW BEST
+  Epoch  6/10  loss=0.0133/0.0911  F1=0.6038  BA=0.7271  [25m 48s] * NEW BEST
+  Epoch  7/10  loss=0.0092/0.1074  F1=0.6051  BA=0.7047  [25m 48s] * NEW BEST
+  Epoch  8/10  loss=0.0073/0.1208  F1=0.6130  BA=0.6903  [25m 48s] * NEW BEST
+  Epoch  9/10  loss=0.0062/0.1215  F1=0.6110  BA=0.6956  [25m 51s]
+  Epoch 10/10  loss=0.0059/0.1222  F1=0.6135  BA=0.6953  [25m 50s] * NEW BEST
+
+  Fold 2 done  F1=0.6306  BA=0.6877  MCC=0.6082  [4h 54m]
+
+------------------------------------------------------------------------
+  FOLD 3/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  LoRA params: 1,351,680  |  Classifier params: 329,735  |  Total trainable: 1,681,415 / 652,724,669 (0.26%)
+  Epoch  1/10  loss=0.1509/0.0969  F1=0.4171  BA=0.5570  [25m 45s] * NEW BEST
+  Epoch  2/10  loss=0.0817/0.0780  F1=0.4948  BA=0.6662  [26m 1s] * NEW BEST
+  Epoch  3/10  loss=0.0524/0.0696  F1=0.5508  BA=0.7135  [25m 51s] * NEW BEST
+  Epoch  4/10  loss=0.0334/0.0714  F1=0.5870  BA=0.7302  [25m 50s] * NEW BEST
+  Epoch  5/10  loss=0.0214/0.0786  F1=0.5777  BA=0.7258  [25m 48s]
+  Epoch  6/10  loss=0.0135/0.0968  F1=0.6006  BA=0.7304  [25m 49s] * NEW BEST
+  Epoch  7/10  loss=0.0100/0.0986  F1=0.5980  BA=0.7396  [25m 50s]
+  Epoch  8/10  loss=0.0077/0.1152  F1=0.6059  BA=0.7049  [25m 49s] * NEW BEST
+  Epoch  9/10  loss=0.0067/0.1217  F1=0.6226  BA=0.7048  [25m 51s] * NEW BEST
+  Epoch 10/10  loss=0.0065/0.1215  F1=0.6212  BA=0.7074  [25m 49s]
+
+  Fold 3 done  F1=0.6197  BA=0.6673  MCC=0.6081  [4h 50m]
+
+------------------------------------------------------------------------
+  FOLD 4/5  train=31,811  val=7,953
+------------------------------------------------------------------------
+  LoRA params: 1,351,680  |  Classifier params: 329,735  |  Total trainable: 1,681,415 / 652,724,669 (0.26%)
+  Epoch  1/10  loss=0.1514/0.1042  F1=0.3707  BA=0.5351  [25m 49s] * NEW BEST
+  Epoch  2/10  loss=0.0840/0.0737  F1=0.4875  BA=0.6766  [25m 50s] * NEW BEST
+  Epoch  3/10  loss=0.0549/0.0734  F1=0.5712  BA=0.6926  [25m 49s] * NEW BEST
+  Epoch  4/10  loss=0.0349/0.0803  F1=0.5470  BA=0.7067  [25m 50s]
+  Epoch  5/10  loss=0.0223/0.0799  F1=0.5749  BA=0.7293  [25m 48s] * NEW BEST
+  Epoch  6/10  loss=0.0142/0.0976  F1=0.6070  BA=0.7210  [25m 50s] * NEW BEST
+  Epoch  7/10  loss=0.0108/0.1073  F1=0.6141  BA=0.7143  [25m 51s] * NEW BEST
+  Epoch  8/10  loss=0.0084/0.1111  F1=0.6238  BA=0.7246  [25m 49s] * NEW BEST
+  Epoch  9/10  loss=0.0073/0.1208  F1=0.6292  BA=0.7133  [25m 47s] * NEW BEST
+  Epoch 10/10  loss=0.0069/0.1225  F1=0.6295  BA=0.7112  [25m 48s] * NEW BEST
+
+  Fold 4 done  F1=0.6261  BA=0.6829  MCC=0.6309  [4h 59m]
+
+------------------------------------------------------------------------
+  FOLD 5/5  train=31,812  val=7,952
+------------------------------------------------------------------------
+  LoRA params: 1,351,680  |  Classifier params: 329,735  |  Total trainable: 1,681,415 / 652,724,669 (0.26%)
+  Epoch  1/10  loss=0.1517/0.1030  F1=0.4310  BA=0.5661  [25m 49s] * NEW BEST
+  Epoch  2/10  loss=0.0802/0.0782  F1=0.5415  BA=0.6746  [25m 46s] * NEW BEST
+  Epoch  3/10  loss=0.0504/0.0752  F1=0.4706  BA=0.6742  [25m 47s]
+  Epoch  4/10  loss=0.0312/0.0841  F1=0.5470  BA=0.7076  [25m 48s] * NEW BEST
+  Epoch  5/10  loss=0.0196/0.0939  F1=0.5964  BA=0.7100  [25m 46s] * NEW BEST
+  Epoch  6/10  loss=0.0130/0.1121  F1=0.5938  BA=0.7000  [25m 49s]
+  Epoch  7/10  loss=0.0099/0.1227  F1=0.5970  BA=0.7053  [25m 48s] * NEW BEST
+  Epoch  8/10  loss=0.0082/0.1310  F1=0.6188  BA=0.7001  [25m 50s] * NEW BEST
+  Epoch  9/10  loss=0.0069/0.1380  F1=0.6189  BA=0.6895  [25m 51s] * NEW BEST
+  Epoch 10/10  loss=0.0067/0.1379  F1=0.6217  BA=0.6946  [25m 50s] * NEW BEST
+
+  Fold 5 done  F1=0.6354  BA=0.6844  MCC=0.6109  [4h 54m]
+
+========================================================================
+  LoRA ESM-2 650M -- 5-Fold CV Summary
+========================================================================
+  Accuracy:          0.8489 +/- 0.0038
+  Macro F1:          0.6309 +/- 0.0078
+  Balanced Accuracy: 0.6800 +/- 0.0071
+  MCC:               0.6167 +/- 0.0095
+========================================================================
+
+--- OOF Classification Report ---
+                precision    recall  f1-score   support
+
+    Not enzyme       0.97      0.88      0.92     32410
+Oxidoreductase       0.54      0.77      0.64      1184
+   Transferase       0.56      0.75      0.64      2769
+     Hydrolase       0.45      0.78      0.57      2108
+         Lyase       0.44      0.55      0.49       600
+     Isomerase       0.59      0.37      0.46       411
+        Ligase       0.74      0.67      0.70       282
+
+      accuracy                           0.85     39764
+     macro avg       0.61      0.68      0.63     39764
+  weighted avg       0.88      0.85      0.86     39764
+
+Confusion matrix saved to /root/protein-classificattion-project/outputs/figures/cm_lora_finetune.png
+Results saved to /root/protein-classificattion-project/outputs/lora_finetune_results.json
+
+========================================================================
+  FINAL RETRAIN (LoRA) on full dataset  (39,764 sequences, 10 epochs)
+========================================================================
+  Epoch  1/10  loss=0.1467  F1=0.2371  [28m 36s]
+  Epoch  2/10  loss=0.0760  F1=0.4630  [28m 36s]
+  Epoch  3/10  loss=0.0493  F1=0.5582  [28m 37s]
+  Epoch  4/10  loss=0.0309  F1=0.6319  [28m 35s]
+  Epoch  5/10  loss=0.0202  F1=0.6843  [28m 37s]
+  Epoch  6/10  loss=0.0126  F1=0.7574  [28m 35s]
+  Epoch  7/10  loss=0.0094  F1=0.7870  [28m 36s]
+  Epoch  8/10  loss=0.0074  F1=0.8091  [28m 34s]
+  Epoch  9/10  loss=0.0064  F1=0.8235  [28m 32s]
+  Epoch 10/10  loss=0.0060  F1=0.8299  [28m 32s]
+
+  Saved -> /root/protein-classificattion-project/outputs/models/lora_final.pt
+Joblib artifact saved -> /root/protein-classificattion-project/outputs/models/lora_artifact.joblib
+
+Total wall time: 29h 19m
+[2026-03-24T09:41:29Z] [INFO] TRAIN: Attempt 1 succeeded (exit 0).
+[2026-03-24T09:41:29Z] [INFO] ==========================================================
+[2026-03-24T09:41:29Z] [INFO]  Training complete. Artefacts:
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/models/finetune_artifact.joblib
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/finetune_results.json
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/models/finetune_fold1.pt
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/models/finetune_fold2.pt
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/models/finetune_fold3.pt
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/models/finetune_fold4.pt
+[2026-03-24T09:41:29Z] [INFO]   /root/protein-classificattion-project/outputs/models/finetune_fold5.pt
+[2026-03-24T09:41:29Z] [INFO] ==========================================================
+[2026-03-24T09:41:29Z] [INFO]  Exiting cleanly. EXIT trap will push to GitHub and stop pod.
+[2026-03-24T09:41:29Z] [INFO] ==========================================================
+[2026-03-24T09:41:29Z] [INFO] ----------------------------------------------------------
+[2026-03-24T09:41:29Z] [INFO]  GIT: Committing artefacts to branch 'runpod-results-20260323-042133'
+[2026-03-24T09:41:29Z] [INFO] ----------------------------------------------------------
